@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * 接口调用示例
+ */
 class DemoController extends Yaf_Controller_Abstract {
 
     public static $transParams = array (
