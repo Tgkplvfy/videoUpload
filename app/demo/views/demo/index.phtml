@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>This is a upload test</title>
+</head>
+<body>
+<h5>上传视频测试</h5>
+<div id="uploadbox">
+	<form id="upload" action="/video" enctype="multipart/form-data" method="POST">
+		<input type="file" name="file">
+
+		<?php foreach ($params as $label => $param): ?>
+		<input type="hidden" name="<?php echo $label;?>" value='<?php echo $param;?>'>
+		<?php endforeach; ?>
+
+		<input type="hidden" name="_method" value="put" />
+
+		<p>&nbsp;</p>
+		<button type="submit">上传</button>
+	</form>
+</div>
+</body>
+</html>
