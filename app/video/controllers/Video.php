@@ -1,7 +1,7 @@
 <?php
 
 class VideoController extends Yaf_Controller_Abstract {
-    
+
     public function indexAction() {
 
         $method = strtolower($_SERVER['REQUEST_METHOD']);
@@ -31,9 +31,9 @@ class VideoController extends Yaf_Controller_Abstract {
     // 编辑操作
     public function postAction () 
     {
-        var_dump($this->getRequest()->getPost());
+        // var_dump($this->getRequest()->getPost());
 
-        var_dump($this->getRequest()->getFiles());
+        // var_dump($this->getRequest()->getFiles());
     }
 
     // 删除操作
@@ -45,14 +45,24 @@ class VideoController extends Yaf_Controller_Abstract {
     // 视频上传接口
     public function putAction () 
     {
-        $post = $this->getRequest()->getPost();
-        $file = $this->getRequest()->getFiles();
+        if ($this->getRequest()->isPost()) 
+        {
+            $post = $this->getRequest()->getPost();
+            $file = $this->getRequest()->getFiles();
+            var_dump($post, $file);
+        }
 
-        // 01. 检验参数
-        $
+        var_dump('PUT');
+
+        // 01. 检验参数 TODO
+
         // 02. 保存文件 FastDFS
+        $Uploader = new Ap_Util_Upload($file['file'], ROOT_PATH . '/storage');
+        $uploadRes = $Uploader->upload();
         // 03. 存储 MongoDB
+
         // 04. 加入转码队列
+
         // 05. 返回信息
     }
 }

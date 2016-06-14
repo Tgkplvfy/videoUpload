@@ -12,14 +12,17 @@ class Bootstrap extends Yaf_Bootstrap_Abstract{
         Yaf_Dispatcher::getInstance()->disableView();
 
         // 获取当前系统配置
-        $config = Yaf_Application::app()->getConfig();
-        Yaf_Registry::set("config", $config);
+        // $config = Yaf_Application::app()->getConfig();
+        // Yaf_Registry::set("config", $config);
     }
 
-    public function _initRoute() {
-    	// 
+    public function _initRoute(Yaf_Dispatcher $dispatcher) {
+    	$router = Yaf_Dispatcher::getInstance()->getRouter();
+        // $router->addConfig(Ap_Base_Router::$index);
+        // var_dump($router);
     }
 
+    // 这个貌似没有用~~
     public function _initDefaultName(Yaf_Dispatcher $dispatcher) {
         $dispatcher->setDefaultModule("Index")->setDefaultController("Index")->setDefaultAction("index");
     }
