@@ -1,7 +1,7 @@
 <?php
 
 class VideoController extends Yaf_Controller_Abstract {
-
+    
     public function indexAction() {
 
         $method = strtolower($_SERVER['REQUEST_METHOD']);

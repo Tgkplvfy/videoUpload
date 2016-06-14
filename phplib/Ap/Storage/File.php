@@ -1,9 +1,9 @@
 <?php
 
 /**
- * 封装FastDFS存储引擎
+ * 默认文件存储引擎
  */
-class Ap_Storage_FastDFS implements Ap_Base_Storage 
+class Ap_Storage_File implements Ap_Base_Storage 
 {
 	public function __construct () 
 	{
@@ -19,5 +19,5 @@ class Ap_Storage_FastDFS implements Ap_Base_Storage
 	{
 		// 
 	}
-	
+
 }
