@@ -18,8 +18,8 @@ class DemoController extends Yaf_Controller_Abstract {
 
         $params = array(
             'bucket_id' => 'www', 
-            'token' => 'sssssssss', 
-            'title' => 'this is the title', 
+            'token' => 'Jshuw235mkkdjgmclt_e2iwrjm', 
+            'title' => 'a file title', 
             'priority' => 'high', 
             'target' => json_encode(self::$transParams)
         );

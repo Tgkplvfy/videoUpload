@@ -20,9 +20,9 @@ class Ap_Storage_FastDFS implements Ap_Base_Storage
 	}
 
 	// 写文件
-	public function write ($file, $path = NULL) 
+	public function write ($file, $path = NULL, $ext = '') 
 	{
-		$result = $this->_fdfs->storage_upload_by_filename($path);
+		$result = $this->_fdfs->storage_upload_by_filename1($file, $ext);
 
 		return $result;
 	}

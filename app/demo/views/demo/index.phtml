@@ -7,15 +7,22 @@
 <h5>上传视频测试</h5>
 <div id="uploadbox">
 	<form id="upload" action="/video" enctype="multipart/form-data" method="POST">
-		<input type="file" name="file">
 
-		<?php foreach ($params as $label => $param): ?>
-		<input type="hidden" name="<?php echo $label;?>" value='<?php echo $param;?>'>
+		<?php foreach ($params as $label => $value): ?>
+		<p>
+			<label for=""><?=$label?></label>
+			<?php if ($label == 'target'): ?>
+			<textarea name="target" style="width:800px;height:100px"><?=$value?></textarea>
+			<?php else:?>
+			<input type="text" name="<?=$label?>" value='<?=$value?>'>
+			<?php endif;?>
+		</p>
 		<?php endforeach; ?>
 
 		<input type="hidden" name="_method" value="put" />
 
-		<p>&nbsp;</p>
+		<p><input type="file" name="files[]"></p>
+		
 		<button type="submit">上传</button>
 	</form>
 </div>

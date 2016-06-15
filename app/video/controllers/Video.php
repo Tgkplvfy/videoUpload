@@ -56,7 +56,7 @@ class VideoController extends Yaf_Controller_Abstract {
         // 01. 获取并检验参数 TODO
 
         // 02. 保存文件 FastDFS
-        $Uploader = new Ap_Util_Upload($file['files'], NULL, array('avi', 'mp4', 'flv'), 2147483648); # 最大 2GB
+        $Uploader = new Ap_Util_Upload($file['files'], NULL, array('avi', 'mp4', 'flv', 'jpg', 'jpeg'), 2147483648); # 最大 2GB
 
         # 上传失败！
         if ( ! $Uploader->upload()) 
@@ -67,11 +67,18 @@ class VideoController extends Yaf_Controller_Abstract {
         }
 
         // 03. 存储 MongoDB
-        $fileInfo = $Uploader->getSaveInfo();
-        var_dump($fileInfo);
-        exit();
-        $apMongo  = new Ap_DB_MongoDB ();
-        $apMongo->insert('video', $fileInfo);
+        $savedFiles = $Uploader->getSaveInfo();
+        $apMongo    = new Ap_DB_MongoDB ();
+        foreach ($savedFiles as $file) 
+        {
+            $mongoData = array(
+                'bucket_id' => 'www', 
+                'filename'  => $fileInfo['saveas'], 
+                'title'     => $post['title'], 
+                'size'      => $fileInfo['']
+            );
+            $apMongo->insert('video', $fileInfo);
+        }
 
         // 04. 加入转码队列
         $queue = new Ap_Queue_Transcode ();

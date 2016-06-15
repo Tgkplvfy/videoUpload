@@ -6,7 +6,7 @@
 date_default_timezone_set('Asia/Shanghai');
 
 /* 指向public的上一级 */
-define("APP_PATH",  realpath(dirname(__FILE__) . '/../'));
+define("ROOT_PATH",  realpath(dirname(__FILE__) . '/../'));
 
 // 获取当前请求的module
 $ary = explode('/', $_SERVER['REQUEST_URI']);
@@ -16,7 +16,7 @@ $module  = in_array($module, $modules) ? $module : 'index';
 
 define("MODULE", $module);
 
-$app = new Yaf_Application(APP_PATH . "/conf/app.ini");
+$app = new Yaf_Application(ROOT_PATH . "/conf/app.ini");
 
 try {
 	$app->bootstrap()->run();

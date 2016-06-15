@@ -112,15 +112,16 @@ class Ap_Util_Upload
 				}
 
 				//检测当前上传文件是否非法提交。
-				if( !is_uploaded_file( $tmpname ) )
+				if( ! is_uploaded_file( $tmpname ) )
 				{
 					$this->last_error = "Invalid post file method. File name is: " . $name;
 					$this->__halt( $this->last_error );
 					continue;
 				}
 
-				$saveFile = $this->saveFile($tmpname);
-				if ($saveFile !== FALSE) {
+				$saveFile = $this->saveFile($tmpname, $type);
+				Ap_Log::video_upload_api(implode(':', array($name, $mime_type)) . ' -> ' . json_encode($saveFile));
+				if ($saveFile == FALSE) {
 					$this->last_error = $this->user_post_file['error'][$i];
 					$this->__halt( $this->last_error );
 					continue;
@@ -132,7 +133,7 @@ class Ap_Util_Upload
 					"type" => $type,
 					"mime_type" => $mime_type,
 					"size" => $size,
-					"saveas" => $saveas,
+					"saveas" => $saveFile['group1'] . '/' . $saveFile['filename'],
 					"path" => $this->final_file_path
 				);
 			}
@@ -161,10 +162,10 @@ class Ap_Util_Upload
 	}
 
 	// 保存文件
-	public function saveFile ($path) 
+	public function saveFile ($path, $ext = '') 
 	{
 		$fDFS = new Ap_Storage_FastDFS();
-		$info = $fDFS->write($path);
+		return $fDFS->write($path, NULL, $ext);
 	}
 
 	/**
