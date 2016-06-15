@@ -9,7 +9,7 @@ class VideoController extends Yaf_Controller_Abstract {
         {
             $post = $this->getRequest()->getPost();
 
-            // 针对表单提交，无法使用PUT，DELETE，可在表单中增加_method字段
+            // 针对表单提交，无法使用PUT，DELETE，可在表单中增加_method字段模拟
             if (isset($post['_method'])) $method = $post['_method']; 
         }
 
@@ -31,15 +31,16 @@ class VideoController extends Yaf_Controller_Abstract {
     // 编辑操作
     public function postAction () 
     {
-        // var_dump($this->getRequest()->getPost());
-
-        // var_dump($this->getRequest()->getFiles());
+        echo 'post action';
+        $post = $this->getRequest()->getPost();
+        $file = $this->getRequest()->getFiles();
     }
 
     // 删除操作
     public function deleteAction () 
     {
-        // 
+        $request = $this->getRequest();
+        var_dump($request->getMethod());
     }
 
     // 视频上传接口
@@ -49,20 +50,42 @@ class VideoController extends Yaf_Controller_Abstract {
         {
             $post = $this->getRequest()->getPost();
             $file = $this->getRequest()->getFiles();
-            var_dump($post, $file);
         }
 
-        var_dump('PUT');
 
-        // 01. 检验参数 TODO
+        // 01. 获取并检验参数 TODO
 
         // 02. 保存文件 FastDFS
-        $Uploader = new Ap_Util_Upload($file['file'], ROOT_PATH . '/storage');
-        $uploadRes = $Uploader->upload();
+        $Uploader = new Ap_Util_Upload($file['files'], NULL, array('avi', 'mp4', 'flv'), 2147483648); # 最大 2GB
+
+        # 上传失败！
+        if ( ! $Uploader->upload()) 
+        {
+            // $this->response($Uploader->last_error); // 失败错误信息
+            echo $Uploader->last_error;
+            exit();
+        }
+
         // 03. 存储 MongoDB
+        $fileInfo = $Uploader->getSaveInfo();
+        var_dump($fileInfo);
+        exit();
+        $apMongo  = new Ap_DB_MongoDB ();
+        $apMongo->insert('video', $fileInfo);
 
         // 04. 加入转码队列
+        $queue = new Ap_Queue_Transcode ();
+        $queue->AddToJob('transcode', 'low', $fileInfo);
 
         // 05. 返回信息
+        $this->response(json_encode(array('error'=>0)));
     }
+
+
+    // 解析HTTP原始请求主体的内容信息
+    public function parseRawInput ($data) 
+    {
+        // $
+    }
+    
 }

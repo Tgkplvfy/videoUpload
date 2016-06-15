@@ -16,6 +16,7 @@ class Bootstrap extends Yaf_Bootstrap_Abstract{
         Yaf_Registry::set("config", $config);
     }
 
+    // 初始化路由
     public function _initRoute() {
     	// 
     }

@@ -49,6 +49,9 @@ class Ap_Util_Upload
 	//返回一组有用信息，用于提示用户。
 	public $save_info = array();
 
+	// 上传成功的文件数量
+	public $succ_num = 0;
+
 	/**
 	 * 构造函数，用与初始化相关信息，用户待上传文件、存储路径等
 	 * @param Array $file  用户上传的文件
@@ -135,7 +138,9 @@ class Ap_Util_Upload
 			}
 		}
 
-		return count( $this->save_info ); //返回上传成功的文件数目
+		$this->succ_num = count( $this->save_info ); //返回上传成功的文件数目
+
+		return $this->succ_num > 0 ? TRUE : FALSE;
 	}
 
 	/**
@@ -145,6 +150,14 @@ class Ap_Util_Upload
 	function getSaveInfo()
 	{
 		return $this->save_info;
+	}
+
+	/**
+	 * 获取本次上传成功的文件个数
+	 */
+	function getSuccNum()
+	{
+		return $this->succ_num;
 	}
 
 	// 保存文件

@@ -1,5 +1,10 @@
 <?php
 
+// ini_set('memory_limit','1024M');
+// set_time_limit(0);
+
+date_default_timezone_set('Asia/Shanghai');
+
 /* 指向public的上一级 */
 define("APP_PATH",  realpath(dirname(__FILE__) . '/../'));
 
