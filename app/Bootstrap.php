@@ -7,16 +7,19 @@
  */
 class Bootstrap extends Yaf_Bootstrap_Abstract{
 
-    public function _initConfig() {
-        $config = Yaf_Application::app()->getConfig();
-        Yaf_Registry::set("config", $config);
+    public function _initConfig(Yaf_Dispatcher $dispatcher) {
+        $dispatcher->autoRender(FALSE); # 关闭默认的模板渲染
     }
 
-    // init Router
-    public function _initRouter() {
-    	// 
+    // 请求分发 按照HTTP REQUEST METHOD
+    public function _initRestfulDispatcher(Yaf_Dispatcher $dispatcher) {
+        $request = $dispatcher->getRequest();
+        $method  = strtolower($request->getMethod());
+
+        // if ()
     }
 
+    // 这个貌似没有用~~
     public function _initDefaultName(Yaf_Dispatcher $dispatcher) {
         $dispatcher->setDefaultModule("Index")->setDefaultController("Index")->setDefaultAction("index");
     }

@@ -1,23 +1,25 @@
 <?php 
 
 // 基础动作类
-class Ap_Base_Action extends Yaf_Controller_Abstract 
+class Ap_Base_Action extends Yaf_Action_Abstract 
 {
-	public function __construct () 
+
+	// implement Parent Class Method
+	public function execute () {}
+	
+	// Action's Response Method 
+	public function response ($data, $code = 200, $msg = 'OK', $eof = TRUE) 
 	{
-		// 构造请求的Request 和 Response
-		parent::__construct();
+		$response = json_encode(array(
+			'code' => $code, 
+			'data' => $data, 
+			'msg' => $msg
+		));
+
+		if ( ! $eof) return $response;
+
+		header('Content-Type: application/json');
+		exit($response);
 	}
 
-	public function index () 
-	{
-		// 
-	}
-
-	public function response () 
-	{
-		// 
-	}
-
-	// public function 
 }
