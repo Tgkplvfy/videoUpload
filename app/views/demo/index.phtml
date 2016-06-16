@@ -11,13 +11,38 @@
 		<?php foreach ($params as $label => $value): ?>
 		<p>
 			<label for=""><?=$label?></label>
-			<?php if ($label == 'target'): ?>
-			<textarea name="target" style="width:800px;height:100px"><?=$value?></textarea>
-			<?php else:?>
 			<input type="text" name="<?=$label?>" value='<?=$value?>'>
-			<?php endif;?>
 		</p>
 		<?php endforeach; ?>
+
+		<p>
+			<label for="">转码设置</label>
+			
+			<label title='{"mime_type":"video/mp4","fps":15,"audio_bps":"64K","video_bps":"256K","width":"720","hight":"480","encrypt":0}'>
+				<input type="checkbox" name='parameter[0]' checked> 普清MP4
+			</label>
+			
+			<label title='{"mime_type":"video/mp4","fps":20,"audio_bps":"64K","video_bps":"384K","width":"1280","hight":"720","encrypt":0}'>
+				<input type="checkbox" name='parameter[1]' checked> 高清MP4
+			</label>
+			
+			<label title='{"mime_type":"video/mp4","fps":25,"audio_bps":"64K","video_bps":"512K","width":"1280","hight":"720","encrypt":0}'>
+				<input type="checkbox" name='parameter[2]' checked> 超清MP4
+			</label>
+			
+			<label title='{"mime_type":"video/mpegts","fps":15,"audio_bps":"64K","video_bps":"256K","width":"720","hight":"480","encrypt":1}'>
+				<input type="checkbox" name='parameter[3]' checked> 普清M3U8
+			</label>
+			
+			<label title='{"mime_type":"video/mpegts","fps":20,"audio_bps":"64K","video_bps":"384K","width":"1280","hight":"720","encrypt":1}'>
+				<input type="checkbox" name='parameter[4]' checked> 高清M3U8
+			</label>
+			
+			<label title='{"mime_type":"video/mpegts","fps":25,"audio_bps":"64K","video_bps":"512K","width":"1280","hight":"720","encrypt":1}'>
+				<input type="checkbox" name='parameter[5]' checked> 超清M3U8
+			</label>
+		</p>
+
 
 		<!-- 表单提交的情况下，可使用POST加_method参数模拟PUT、DELETE请求 -->
 		<input type="hidden" name="_method" value="put" />

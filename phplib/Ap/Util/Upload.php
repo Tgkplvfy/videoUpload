@@ -117,21 +117,29 @@ class Ap_Util_Upload
 				}
 
 				$saveFile = $this->saveFile($tmpname, $type);
-				Ap_Log::video_upload_api(implode(':', array($name, $mime_type)) . ' -> ' . json_encode($saveFile));
+				Ap_Log::video_upload_api(implode(':', array($name, $mime_type)) . ' -> ' . $saveFile);
 				if ($saveFile == FALSE) {
 					$this->last_error = $this->user_post_file['error'][$i];
 					$this->__halt( $this->last_error );
 					continue;
 				}
 
+				// 创建视频文件缩略图
+				$thumb_file = preg_replace('/\//', '-', $saveFile) . '.jpg';
+				Ap_Util_Video::createThumb($tmpname, '720x480', ROOT_PATH . '/storage/thumb/' . $thumb_file);
+				$duration   = Ap_Util_Video::getLong($tmpname);
+
 				//存储当前文件的有关信息，以便其它程序调用。
 				$this->save_info[] =  array(
-					"name" => $name,
-					"type" => $type,
+					"name"      => $name,
+					"type"      => $type,
 					"mime_type" => $mime_type,
-					"size" => $size,
-					"saveas" => $saveFile, 
-					"path" => $saveFile
+					"size"      => $size,
+					"saveas"    => $saveFile, 
+					"pic"       => $thumb_file, 
+					"duration"  => $duration, 
+					"md5"       => md5_file($tmpname), 
+					"path"      => $saveFile
 				);
 			}
 		}
@@ -223,6 +231,13 @@ class Ap_Util_Upload
 		}
 	    
 	} // end func
+
+
+	// 获取文件的附加信息 TODO
+	private function __getVideoInfo ($file) 
+	{
+		// 
+	}
     
 } // end class
 ?>

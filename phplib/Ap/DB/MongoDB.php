@@ -64,8 +64,8 @@ class Ap_DB_MongoDB {
             return $this->_mongoClient;
         }
 
-        $mongo_ini = new Yaf_Config_Ini(APP_PATH . '/conf/mongodb.ini', $this->_moduleName);
-        //$mongo = new MongoClient("mongodb://{$mongo_ini->user}:{$mongo_ini->pass}@{$mongo_ini->host}");
+        $mongo_ini = new Yaf_Config_Ini(ROOT_PATH . '/conf/mongodb.ini', $this->_moduleName);
+        //$mongo = new MongoClient("mongodb://{$mongo_ini->user}:{$mongo_ini->pass}@{$mongo_ini->host}"); 
         $mongo = new MongoClient($mongo_ini->host);
         if ($mongo){
             $this->_mongoClient = $mongo;

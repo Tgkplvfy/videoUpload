@@ -1,6 +1,6 @@
 <?php 
 
-class DemogetAction extends Ap_Base_Action 
+class DemoGetAction extends Ap_Base_Action 
 {
     public static $transParams = array (
         array('mime_type'=>'video/mp4', 'fps'=>15, 'audio_bps'=>'64K', 'video_bps'=>'256K', 'width'=>'720', 'hight'=>'480', 'encrypt'=>0), 
@@ -18,7 +18,7 @@ class DemogetAction extends Ap_Base_Action
             'token' => 'Jshuw235mkkdjgmclt_e2iwrjm', 
             'title' => 'a file title', 
             'priority' => 'high', 
-            'target' => json_encode(self::$transParams)
+            // 'target' => json_encode(self::$transParams)
         );
 
         $this->getView()->assign("params", $params);
