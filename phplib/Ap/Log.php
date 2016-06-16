@@ -41,7 +41,7 @@ class Ap_Log {
 
     public static function video_upload_api($msg)
     {
-        self::__log($msg, ROOT_PATH . '/logs/videUploadApi.log');
+        self::__log($msg, ROOT_PATH . '/logs/videoUploadApi.log');
     }
     
     /**
