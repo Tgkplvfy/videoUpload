@@ -19,6 +19,7 @@
 		</p>
 		<?php endforeach; ?>
 
+		<!-- 表单提交的情况下，可使用POST加_method参数模拟PUT、DELETE请求 -->
 		<input type="hidden" name="_method" value="put" />
 
 		<p><input type="file" name="files[]"></p>

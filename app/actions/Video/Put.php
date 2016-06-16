@@ -12,16 +12,18 @@ class VideoPutAction extends Ap_Base_Action
         }
 
         // 01. 获取并检验参数 TODO
+        if ( ! isset($file['files'])) {
+            $this->response(NULL, 400, 'no files uploaded');
+        }
 
         // 02. 保存文件 FastDFS
-        $Uploader = new Ap_Util_Upload($file['files'], NULL, array('avi', 'mp4', 'flv', 'jpg', 'jpeg'), 2147483648); # 最大 2GB
-
-        # 上传失败！
-        if ( ! $Uploader->upload()) 
+        $allowTypes = array('avi', 'mp4', 'flv', 'jpg', 'jpeg'); # 测试允许jpg类型
+        $allowSize  = 2147483648; # 最大 2GB
+        $Uploader = new Ap_Util_Upload($file['files'], NULL, $allowTypes, $allowSize);
+        if ( ! $Uploader->upload()) # 上传失败！
         {
-            // $this->response($Uploader->last_error); // 失败错误信息
-            echo $Uploader->last_error;
-            exit();
+            // Ap_Log::log($Uploader->last_error);
+            $this->response(NULL, 500, 'upload failed'); # 失败错误信息
         }
 
         // 03. 存储 MongoDB
@@ -33,7 +35,12 @@ class VideoPutAction extends Ap_Base_Action
                 'bucket_id' => 'www', 
                 'filename'  => $fileInfo['saveas'], 
                 'title'     => $post['title'], 
-                'size'      => $fileInfo['']
+                'size'      => $fileInfo['size'], 
+                'mime_type' => $fileInfo['mime_type'], 
+                'md5_file'  => '', 
+                'pic'       => '', 
+                'duration'  => '', 
+                'fragment'  => array() 
             );
             $apMongo->insert('video', $fileInfo);
         }

@@ -43,9 +43,6 @@ class Ap_Util_Upload
 	//默认允许用户上传的文件类型
 	public $allow_type = array('avi', 'flv', 'mp4');
 
-	//最终保存的文件名
-	public $final_file_path;
-
 	//返回一组有用信息，用于提示用户。
 	public $save_info = array();
 
@@ -133,8 +130,8 @@ class Ap_Util_Upload
 					"type" => $type,
 					"mime_type" => $mime_type,
 					"size" => $size,
-					"saveas" => $saveFile['group1'] . '/' . $saveFile['filename'],
-					"path" => $this->final_file_path
+					"saveas" => $saveFile, 
+					"path" => $saveFile
 				);
 			}
 		}

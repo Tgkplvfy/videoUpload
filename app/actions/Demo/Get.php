@@ -25,6 +25,12 @@ class DemogetAction extends Ap_Base_Action
         $this->getView()->display('demo/index.phtml');
     }
 
+    // 根据access和secret获取一个api请求的token
+    public function getToken ($access, $secret) 
+    {
+        // 
+    }
+
     # 获取签名算法
     public function getSignature () 
     {

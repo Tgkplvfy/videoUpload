@@ -6,5 +6,10 @@ class IndexController extends Ap_Base_Control {
 
         // echo 'string';
     }
+
+    public function IndexAction () 
+    {
+        echo 'hello restful api';
+    }
     
 }
