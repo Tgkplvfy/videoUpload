@@ -56,6 +56,7 @@ class VideoPutAction extends Ap_Base_Action
         $MongoClient = $apMongo->getCollection(self::MONGO_VIDEO_COLLECTION);
 
         $fileList = array();
+        $files = array();
         foreach ($savedFiles as $file) 
         {
             $mongoData = array(
@@ -73,6 +74,7 @@ class VideoPutAction extends Ap_Base_Action
 
             $MongoClient->save($mongoData);
 
+            $files[] = $mongoData;
             $fileList[] = array(
                 '_id' => $mongoData['_id'], 
                 'pic' => $mongoData['pic'] 
@@ -80,8 +82,7 @@ class VideoPutAction extends Ap_Base_Action
         }
 
         // 04. 加入转码队列
-        $queue = new Ap_Queue_Transcode ();
-        $queue->AddToJob('transcode', 'low', $fileInfo);
+        $this->sendToQueue($files, $params);
 
         // 05. 返回信息
         $this->response($fileList);
@@ -106,9 +107,9 @@ class VideoPutAction extends Ap_Base_Action
     }
 
     # 加入转码队列
-    private function sendToQueue ($file, $setting) 
+    private function sendToQueue ($files, $params) 
     {
-        // 
+        if (empty($params)) return TRUE;
     }
 
     /**

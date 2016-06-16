@@ -11,5 +11,4 @@ class DemoController extends Ap_Base_Control {
         // 'demoput'    => 'actions/Demo/Put.php',    # 上传视频文件
         // 'demodelete' => 'actions/Demo/Delete.php'  # 删除视频文件
     );
-
 }
