@@ -25,19 +25,17 @@ class VideoPutAction extends Ap_Base_Action
             $file = $this->getRequest()->getFiles();
         }
 
-        print_r($post);
-        exit();
-
         // 01. 获取并检验参数 TODO
         if ( ! isset($file['files'])) {
             $this->response(NULL, 400, 'no files uploaded');
         }
 
-        // 校验上传后的转码设置
-        $parameter = $post['parameter'];
+        # 校验上传后的转码设置，最多设置6个转码参数
+        $parameter = array_slice($post['parameter'], 0, 6);
         $transcode = array();
         foreach ($parameter as $key => $val) {
-            $transcode[] = self::$transSettings[$key];
+            if (isset(self::$transSettings[$key]))
+                $transcode[] = self::$transSettings[$key];
         }
 
         // 02. 保存文件 FastDFS

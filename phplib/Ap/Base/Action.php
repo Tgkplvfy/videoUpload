@@ -5,7 +5,12 @@ class Ap_Base_Action extends Yaf_Action_Abstract
 {
 
 	// implement Parent Class Method
-	public function execute () {}
+	public function execute () 
+	{
+		# 验证api token 
+		$token = $_REQUEST['token'];
+		// $
+	}
 	
 	// Action's Response Method 
 	public function response ($data, $code = 200, $msg = 'OK', $eof = TRUE) 
@@ -21,5 +26,7 @@ class Ap_Base_Action extends Yaf_Action_Abstract
 		header('Content-Type: application/json');
 		exit($response);
 	}
+
+	// public
 
 }
