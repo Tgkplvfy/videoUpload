@@ -1,6 +1,8 @@
 <?php 
 
-// 视频上传
+/**
+ * 视频上传
+ */
 class VideoPutAction extends Ap_Base_Action 
 {
     const MONGO_VIDEO_DB         = 'storage';
@@ -8,13 +10,18 @@ class VideoPutAction extends Ap_Base_Action
 
     const GEARMAN_FUN_DEFAULT    = 'imooc_video_convert'; # Gearman 默认转码任务
 
+    const TRANSCODE_JOB_WAITING =  1;   # 转码等待开始（未开始）
+    const TRANSCODE_JOB_STARTED =  2;   # 转码队列进行中
+    const TRANSCODE_JOB_DONE    =  3;   # 转码完成
+    const TRANSCODE_JOB_FAILED  = -1;   # 转码失败
+
     public static $transSettings = array(
-        array('mime_type'=>'video/mp4', 'fps'=>15, 'audio_bps'=>'64K', 'video_bps'=>'256K', 'width'=>'720', 'hight'=>'480', 'encrypt'=>0), 
-        array('mime_type'=>'video/mp4', 'fps'=>20, 'audio_bps'=>'64K', 'video_bps'=>'384K', 'width'=>'1280', 'hight'=>'720', 'encrypt'=>0), 
-        array('mime_type'=>'video/mp4', 'fps'=>25, 'audio_bps'=>'64K', 'video_bps'=>'512K', 'width'=>'1280', 'hight'=>'720', 'encrypt'=>0), 
-        array('mime_type'=>'video/mpegts', 'fps'=>15, 'audio_bps'=>'64K', 'video_bps'=>'256K', 'width'=>'720', 'hight'=>'480', 'encrypt'=>1), 
-        array('mime_type'=>'video/mpegts', 'fps'=>20, 'audio_bps'=>'64K', 'video_bps'=>'384K', 'width'=>'1280', 'hight'=>'720', 'encrypt'=>1), 
-        array('mime_type'=>'video/mpegts', 'fps'=>25, 'audio_bps'=>'64K', 'video_bps'=>'512K', 'width'=>'1280', 'hight'=>'720', 'encrypt'=>1) 
+        array('mime_type'=>'video/mp4',    'fps'=>15, 'audio_bps'=>'64K', 'video_bps'=>'256K', 'width'=>'720',  'height'=>'480', 'encrypt'=>0), 
+        array('mime_type'=>'video/mp4',    'fps'=>20, 'audio_bps'=>'64K', 'video_bps'=>'384K', 'width'=>'1280', 'height'=>'720', 'encrypt'=>0), 
+        array('mime_type'=>'video/mp4',    'fps'=>25, 'audio_bps'=>'64K', 'video_bps'=>'512K', 'width'=>'1280', 'height'=>'720', 'encrypt'=>0), 
+        array('mime_type'=>'video/mpegts', 'fps'=>15, 'audio_bps'=>'64K', 'video_bps'=>'256K', 'width'=>'720',  'height'=>'480', 'encrypt'=>1), 
+        array('mime_type'=>'video/mpegts', 'fps'=>20, 'audio_bps'=>'64K', 'video_bps'=>'384K', 'width'=>'1280', 'height'=>'720', 'encrypt'=>1), 
+        array('mime_type'=>'video/mpegts', 'fps'=>25, 'audio_bps'=>'64K', 'video_bps'=>'512K', 'width'=>'1280', 'height'=>'720', 'encrypt'=>1) 
     );
 
     public function execute () 
@@ -35,7 +42,7 @@ class VideoPutAction extends Ap_Base_Action
         $transcode = array();
         foreach ($parameter as $key => $val) {
             if (isset(self::$transSettings[$key]))
-                $transcode[] = self::$transSettings[$key];
+                $transcode[] = array_merge(self::$transSettings[$key], array('status'=>self::TRANSCODE_JOB_WAITING));
         }
 
         // 02. 保存文件 FastDFS
@@ -67,7 +74,7 @@ class VideoPutAction extends Ap_Base_Action
                 'md5_file'  => $file['md5'], 
                 'pic'       => $file['pic'], 
                 'duration'  => $file['duration'], 
-                'fragment'  => array() 
+                'fragment'  => $transcode 
             );
 
             $MongoClient->save($mongoData);
@@ -80,7 +87,7 @@ class VideoPutAction extends Ap_Base_Action
         }
 
         // 04. 加入转码队列
-        $this->sendToQueue($files, $params);
+        $this->sendToQueue($files, $transcode);
 
         // 05. 返回信息
         $this->response($fileList);
@@ -107,7 +114,18 @@ class VideoPutAction extends Ap_Base_Action
     # 加入转码队列
     private function sendToQueue ($files, $params) 
     {
-        if (empty($params)) return TRUE;
+        if (empty($files) OR empty($params)) return TRUE;
+
+        # 每个文件执行所有转码任务
+        foreach ($files as $file) {
+            $job = $this->createJobs($file, $params);
+            if ( ! $job) continue;
+
+            # 转码状态为正在转码
+            // $queued[] = 
+        }
+
+        return TRUE;
     }
 
     /**
@@ -117,7 +135,7 @@ class VideoPutAction extends Ap_Base_Action
      *
      * @return boolean 创建成功状态
      */
-    private function createJobs ($files, $param) 
+    private function createJobs ($file, $params) 
     {
         // 
     }

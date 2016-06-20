@@ -35,6 +35,8 @@ class Ap_Base_Action extends Yaf_Action_Abstract
 		if ( ! $eof) return $response;
 
 		header('Content-Type: application/json');
+		# cors settings
+		header('Access-Control-Allow-Origin: *');
 		exit($response);
 	}
 
