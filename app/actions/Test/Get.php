@@ -25,6 +25,9 @@ class TestGetAction extends Ap_Base_Action
         foreach (self::$funcs as $key => $val) {
             echo $key . ': ' . $val . '<br>';
         }
+
+        // var_dump($this->getRequest()->getParams());
+        // var_dump($_GET);
     }
 
     public function testMongo () 
