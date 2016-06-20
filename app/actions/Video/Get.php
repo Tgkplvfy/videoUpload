@@ -19,17 +19,20 @@ class VideoGetAction extends Ap_Base_Action
         $apMongo    = new Ap_DB_MongoDB ();
         $collection = $apMongo->getCollection('video');
 
-        $where = array();
+        $where = array(
+            // 'bucket_id' => '$in "www"'
+        );
         if ($search) $where['title'] = new MongoRegex("/{$search}/");
+        
         $total = $collection->find($where)->count();
-        $data = $collection->find($where)
+        
+        $list = $collection->find($where)
             ->limit($pagesize)
             ->skip(($page - 1)*$pagesize)
             ->sort(array('_id'=>1));
 
-        $list = iterator_to_array($data);
         $this->response(array(
-            'list' => $list, 
+            'list' => iterator_to_array($list), 
             'page' => $page, 
             'pagesize' => $pagesize, 
             'total' => $total
