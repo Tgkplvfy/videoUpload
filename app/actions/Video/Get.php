@@ -21,6 +21,7 @@ class VideoGetAction extends Ap_Base_Action
 
         $where = array();
         if ($search) $where['title'] = new MongoRegex("/{$search}/");
+        $total = $collection->find($where)->count();
         $data = $collection->find($where)
             ->limit($pagesize)
             ->skip(($page - 1)*$pagesize)
@@ -31,7 +32,7 @@ class VideoGetAction extends Ap_Base_Action
             'list' => $list, 
             'page' => $page, 
             'pagesize' => $pagesize, 
-            'total' => 200
+            'total' => $total
         ));
     }
 }
