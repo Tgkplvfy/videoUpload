@@ -81,7 +81,7 @@ class VideoPutAction extends Ap_Base_Action
 
             $files[] = $mongoData;
             $fileList[] = array(
-                '_id' => $mongoData['_id'], 
+                '_id' => (string) $mongoData['_id'], # 转为字符串
                 'pic' => $mongoData['pic'] 
             );
         }
@@ -137,7 +137,27 @@ class VideoPutAction extends Ap_Base_Action
      */
     private function createJobs ($file, $params) 
     {
-        // 
+        // $job = array ();
+        $gmclient = new GearmanClient();
+        $gmclient->addServer($_SERVER['GEARMAN_HOST'], $_SERVER['GEARMAN_PORT']);
+
+        $fileid = (string) $file['_id'];
+        $i = 0;
+        foreach ($params as $param) {
+            // $uniqKey = implode('-', array($fileid, $param['fps'], $param['audio_bps'], $param['video_bps'], $param['width'], $param['height']));
+            $uniqKey = $fileid . '_' . $i++;
+            $workload = json_encode(array('_id' => $fileid, 'fragment' => $param));
+            $result  = $gmclient->doBackground(self::GEARMAN_FUN_DEFAULT, $workload, $uniqKey);
+            if (!$result) {
+                sleep(1);
+                $result = $gmclient->doBackground(self::GEARMAN_FUN_DEFAULT, $workload, $uniqKey);  
+                if(!$result){
+                    $errno = $gmclient->getErrno();
+                    // Ap_Log::log($errno . ':' . $gmclient->error());
+                    // var_dump($errno, $gmclient->error());
+                }      
+            }
+        }
     }
 
 }
