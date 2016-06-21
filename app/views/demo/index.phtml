@@ -6,7 +6,7 @@
 <body>
 <h5>上传视频测试</h5>
 <div id="uploadbox">
-	<form id="upload" action="/video" enctype="multipart/form-data" method="POST">
+	<form id="upload" action="<?=$action?>" enctype="multipart/form-data" method="POST">
 
 		<?php foreach ($params as $label => $value): ?>
 		<p>

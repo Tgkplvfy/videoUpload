@@ -13,6 +13,7 @@ class DemoGetAction extends Ap_Base_Action
 
     public function execute () 
     {
+        $action = isset($_GET['action']) ? $_GET['action'] : '/video';
         $params = array(
             'bucket_id' => 'www', 
             'token' => 'Jshuw235mkkdjgmclt_e2iwrjm', 
@@ -22,6 +23,7 @@ class DemoGetAction extends Ap_Base_Action
         );
 
         $this->getView()->assign("params", $params);
+        $this->getView()->assign("action", $action);
         $this->getView()->display('demo/index.phtml');
     }
 
