@@ -57,14 +57,14 @@ class VideoPutAction extends Ap_Base_Action
 
         // 03. 转储文件信息到 MongoDB
         $savedFiles  = $Uploader->getSaveInfo();
-        $files = $this->saveToMongoDB($savedFiles);
+        $files = $this->saveToMongoDB($savedFiles, $post['title'], $transcode);
 
         // 04. 加入转码队列
         $this->sendToQueue($files, $transcode);
 
         // 05. 返回信息
         $fileList = array ();
-        foreach ($fileList as $file) {
+        foreach ($files as $file) {
             $fileList[] = array(
                 '_id' => (string) $file['_id'], 
                 'pic' => $file['pic']
@@ -86,22 +86,22 @@ class VideoPutAction extends Ap_Base_Action
     }
 
     # 转储MongoDB
-    private function saveToMongoDB ($savedFiles) 
+    private function saveToMongoDB ($savedFiles, $title = '', $transcode) 
     {
         $apMongo     = new Ap_DB_MongoDB ();
         $MongoClient = $apMongo->getCollection(self::MONGO_VIDEO_COLLECTION);
 
-        $files = array();
-        $imgAdapter = new Ap_ImageAdapter();
+        $files      = array();
+        $imgAdapter = new Ap_ImageAdapter ();
         foreach ($savedFiles as $file) 
         {
             # 缩略图文件转储到MongoDB并更新字段值
             $picHashKey = $imgAdapter->write($file['pic']);
-            $mongoData = array(
+            $mongoData  = array(
                 '_id'       => new MongoId(), 
                 'bucket_id' => 'www', 
                 'filename'  => $file['saveas'], 
-                'title'     => $post['title'], 
+                'title'     => $title, 
                 'size'      => $file['size'], 
                 'mime_type' => $file['mime_type'], 
                 'md5_file'  => $file['md5'], 
