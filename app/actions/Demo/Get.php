@@ -16,7 +16,7 @@ class DemoGetAction extends Ap_Base_Action
         $action = isset($_GET['action']) ? $_GET['action'] : '/video';
         $params = array(
             'bucket_id' => 'www', 
-            'token' => 'Jshuw235mkkdjgmclt_e2iwrjm', 
+            'token' => 'imooc_upload:uploadsecret', 
             'title' => 'a file title', 
             'priority' => 'high', 
             // 'target' => json_encode(self::$transParams)
