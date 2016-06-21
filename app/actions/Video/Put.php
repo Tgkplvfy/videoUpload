@@ -57,39 +57,19 @@ class VideoPutAction extends Ap_Base_Action
 
         // 03. 转储文件信息到 MongoDB
         $savedFiles  = $Uploader->getSaveInfo();
-        $apMongo     = new Ap_DB_MongoDB ();
-        $MongoClient = $apMongo->getCollection(self::MONGO_VIDEO_COLLECTION);
-
-        $fileList = array();
-        $files = array();
-        foreach ($savedFiles as $file) 
-        {
-            $mongoData = array(
-                '_id'       => new MongoId(), 
-                'bucket_id' => 'www', 
-                'filename'  => $file['saveas'], 
-                'title'     => $post['title'], 
-                'size'      => $file['size'], 
-                'mime_type' => $file['mime_type'], 
-                'md5_file'  => $file['md5'], 
-                'pic'       => $file['pic'], 
-                'duration'  => $file['duration'], 
-                'fragment'  => $transcode 
-            );
-
-            $MongoClient->save($mongoData);
-
-            $files[] = $mongoData;
-            $fileList[] = array(
-                '_id' => (string) $mongoData['_id'], # 转为字符串
-                'pic' => $mongoData['pic'] 
-            );
-        }
+        $files = $this->saveToMongoDB($savedFiles);
 
         // 04. 加入转码队列
         $this->sendToQueue($files, $transcode);
 
         // 05. 返回信息
+        $fileList = array ();
+        foreach ($fileList as $file) {
+            $fileList[] = array(
+                '_id' => (string) $file['_id'], 
+                'pic' => $file['pic']
+            );
+        }
         $this->response($fileList);
     }
 
@@ -106,9 +86,37 @@ class VideoPutAction extends Ap_Base_Action
     }
 
     # 转储MongoDB
-    private function saveToMongoDB ($fileInfos) 
+    private function saveToMongoDB ($savedFiles) 
     {
-        // 
+        $apMongo     = new Ap_DB_MongoDB ();
+        $MongoClient = $apMongo->getCollection(self::MONGO_VIDEO_COLLECTION);
+
+        $files = array();
+        $imgAdapter = new Ap_ImageAdapter();
+        foreach ($savedFiles as $file) 
+        {
+            # 缩略图文件转储到MongoDB并更新字段值
+            $picHashKey = $imgAdapter->write($file['pic']);
+            $mongoData = array(
+                '_id'       => new MongoId(), 
+                'bucket_id' => 'www', 
+                'filename'  => $file['saveas'], 
+                'title'     => $post['title'], 
+                'size'      => $file['size'], 
+                'mime_type' => $file['mime_type'], 
+                'md5_file'  => $file['md5'], 
+                'pic'       => $imgAdapter->getURL($picHashKey, '720', '480'), 
+                'duration'  => $file['duration'], 
+                'fragment'  => $transcode 
+            );
+
+            # 删除临时缩略图文件
+            $MongoClient->save($mongoData);
+
+            $files[] = $mongoData;
+        }
+
+        return $files;
     }
 
     # 加入转码队列
@@ -120,9 +128,6 @@ class VideoPutAction extends Ap_Base_Action
         foreach ($files as $file) {
             $job = $this->createJobs($file, $params);
             if ( ! $job) continue;
-
-            # 转码状态为正在转码
-            // $queued[] = 
         }
 
         return TRUE;
@@ -144,7 +149,6 @@ class VideoPutAction extends Ap_Base_Action
         $fileid = (string) $file['_id'];
         $i = 0;
         foreach ($params as $param) {
-            // $uniqKey = implode('-', array($fileid, $param['fps'], $param['audio_bps'], $param['video_bps'], $param['width'], $param['height']));
             $uniqKey = $fileid . '_' . $i++;
             $workload = json_encode(array('_id' => $fileid, 'fragment' => $param));
             $result  = $gmclient->doBackground(self::GEARMAN_FUN_DEFAULT, $workload, $uniqKey);
@@ -154,7 +158,6 @@ class VideoPutAction extends Ap_Base_Action
                 if(!$result){
                     $errno = $gmclient->getErrno();
                     // Ap_Log::log($errno . ':' . $gmclient->error());
-                    // var_dump($errno, $gmclient->error());
                 }      
             }
         }

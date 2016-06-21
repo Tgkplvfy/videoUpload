@@ -125,8 +125,9 @@ class Ap_Util_Upload
 				}
 
 				// 创建视频文件缩略图
-				$thumb_file = 'thumbs/' . preg_replace('/\//', '-', $saveFile) . '.jpg';
-				Ap_Util_Video::createThumb($tmpname, '720x480', ROOT_PATH . '/www/' . $thumb_file);
+				$thumb_file = ROOT_PATH . '/storage/' . preg_replace('/\//', '-', $saveFile) . '.jpg';
+				Ap_Util_Video::createThumb($tmpname, '720x480', $thumb_file);
+
 				$duration   = Ap_Util_Video::getLong($tmpname);
 
 				//存储当前文件的有关信息，以便其它程序调用。
