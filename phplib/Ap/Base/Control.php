@@ -7,8 +7,17 @@
  * 例：'videoget' => 'actions/Video/Get.php'
  * ------------------------------------------------
  */
+
+use League\OAuth2\Server\AuthorizationServer;
+use League\OAuth2\Server\ResourceServer;
+
 class Ap_Base_Control extends Yaf_Controller_Abstract
 {
+	# OAuth 2.0 服务
+	protected $_oauthServer;
+
+	public $actions = array();
+	
 	// init Restful API request dispatch
 	public function init () 
 	{
@@ -38,10 +47,10 @@ class Ap_Base_Control extends Yaf_Controller_Abstract
 			# 给当前Controller添加restFUL的action路由, 并设定rest action的名字
 			$this->actions = array_merge($this->actions, $restActions);
 			$request->setActionName($controller . $method);
-
 		}
 	}
 
+	# 接口返回数据 JSON 格式
 	public function response ($data, $code = 200, $msg = 'OK', $eof = TRUE) 
 	{
 		$response = json_encode(array(
@@ -58,7 +67,7 @@ class Ap_Base_Control extends Yaf_Controller_Abstract
 		exit($response);
 	}
 
-	# 检验请求是否合法
+	# 检验请求是否合法 deprecated for now
 	public function verifyRequest () 
 	{
 		# 校验请求 token
@@ -73,7 +82,6 @@ class Ap_Base_Control extends Yaf_Controller_Abstract
 			$this->response(NULL, 401, 'Invalid token !');
 		}
 	}
-	
 
 	# 获取当前请求的APP信息
 	private function _getAppInfo ($appkey = '') 
@@ -84,6 +92,12 @@ class Ap_Base_Control extends Yaf_Controller_Abstract
 		$appInfo = $collection->findOne(array('appkey'=>$appkey));
 
 		return $appInfo ? $appInfo : FALSE;
+	}
+
+	# initialize an oauth server SHOULD USE *DI*
+	public function getOAuthServer () 
+	{
+		$this->_oauthServer = new AuthorizationServer();
 	}
 
 }

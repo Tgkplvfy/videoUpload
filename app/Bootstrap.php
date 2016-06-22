@@ -13,10 +13,6 @@ class Bootstrap extends Yaf_Bootstrap_Abstract{
 
     // 请求分发 按照HTTP REQUEST METHOD
     public function _initRestfulDispatcher(Yaf_Dispatcher $dispatcher) {
-        $request = $dispatcher->getRequest();
-        $method  = strtolower($request->getMethod());
-
-        // if ()
     }
 
     // 这个貌似没有用~~

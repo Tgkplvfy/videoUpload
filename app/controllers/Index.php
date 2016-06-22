@@ -7,7 +7,7 @@ class IndexController extends Ap_Base_Control {
 
     public function IndexAction () 
     {
-        echo 'hello restful api, we are using github now';
+        echo "hello oauth2.0, we're running fast";
         // print_r($this->actions);
     }
     

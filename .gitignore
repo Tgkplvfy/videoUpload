@@ -50,5 +50,3 @@ Temporary Items
 logs/*
 storage/*
 .vscode
-www/thumbs/*
-phplib/League/OAuth2/*
