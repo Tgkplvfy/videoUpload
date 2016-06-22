@@ -10,6 +10,9 @@
 
 use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\ResourceServer;
+use OAuth2\Server\Repositories\AccessTokenRepository;
+use OAuth2\Server\Repositories\ClientRepository;
+use OAuth2\Server\Repositories\ScopeRepository;
 
 class Ap_Base_Control extends Yaf_Controller_Abstract
 {
@@ -48,6 +51,8 @@ class Ap_Base_Control extends Yaf_Controller_Abstract
 			$this->actions = array_merge($this->actions, $restActions);
 			$request->setActionName($controller . $method);
 		}
+
+		// $this->getOAuthServer();
 	}
 
 	# 接口返回数据 JSON 格式
@@ -97,7 +102,9 @@ class Ap_Base_Control extends Yaf_Controller_Abstract
 	# initialize an oauth server SHOULD USE *DI*
 	public function getOAuthServer () 
 	{
-		$this->_oauthServer = new AuthorizationServer();
+		$server = new AuthorizationServer();
+		$server->enableGrantType('clint');
+		$this->_oauthServer = $server;
 	}
 
 }
