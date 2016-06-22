@@ -1,0 +1,16 @@
+<?php 
+
+# 测试OAuth接口认证
+use League\OAuth2\Client\Grant\AuthorizationCode;
+class OAuthAction extends Ap_Base_Action 
+{
+    private $_appkey = '';
+    private $_secret = '';
+
+    public function execute () 
+    {
+        // echo 'testing... oauth';
+
+        $client = new AuthorizationCode();
+    }
+}
