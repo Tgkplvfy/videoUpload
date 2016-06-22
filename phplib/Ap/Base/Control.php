@@ -102,8 +102,12 @@ class Ap_Base_Control extends Yaf_Controller_Abstract
 	# initialize an oauth server SHOULD USE *DI*
 	public function getOAuthServer () 
 	{
+        $clientRepository      = new ClientRepository();       // instance of ClientRepositoryInterface
+        $scopeRepository       = new ScopeRepository();        // instance of ScopeRepositoryInterface
+        $accessTokenRepository = new AccessTokenRepository();  // instance of AccessTokenRepositoryInterface
+
 		$server = new AuthorizationServer();
-		$server->enableGrantType('clint');
+		$server->enableGrantType('client_credentials');
 		$this->_oauthServer = $server;
 	}
 

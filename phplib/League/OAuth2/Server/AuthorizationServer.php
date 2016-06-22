@@ -19,7 +19,7 @@ use League\OAuth2\Server\RequestTypes\AuthorizationRequest;
 use League\OAuth2\Server\ResponseTypes\BearerTokenResponse;
 use League\OAuth2\Server\ResponseTypes\ResponseTypeInterface;
 
-class AuthorizationServer implements EmitterAwareInterface
+class AuthorizationServer 
 {
     /**
      * @var \League\OAuth2\Server\Grant\GrantTypeInterface[]

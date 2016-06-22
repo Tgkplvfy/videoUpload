@@ -151,14 +151,18 @@ class VideoPutAction extends Ap_Base_Action
         foreach ($params as $param) {
             $uniqKey = $fileid . '_' . $i++;
             $workload = json_encode(array('_id' => $fileid, 'fragment' => $param));
-            $result  = $gmclient->doBackground(self::GEARMAN_FUN_DEFAULT, $workload, $uniqKey);
-            if (!$result) {
-                sleep(1);
-                $result = $gmclient->doBackground(self::GEARMAN_FUN_DEFAULT, $workload, $uniqKey);  
-                if(!$result){
-                    $errno = $gmclient->getErrno();
-                    // Ap_Log::log($errno . ':' . $gmclient->error());
-                }      
+            try {
+                $result  = $gmclient->doBackground(self::GEARMAN_FUN_DEFAULT, $workload, $uniqKey);
+                if (!$result) {
+                    sleep(1);
+                    $result = $gmclient->doBackground(self::GEARMAN_FUN_DEFAULT, $workload, $uniqKey);
+                    if(!$result){
+                        $errno = $gmclient->getErrno();
+                        // Ap_Log::log($errno . ':' . $gmclient->error());
+                    }
+                }
+            } catch (Exception $e) {
+                // Ap_Log::log($e->getMessage());
             }
         }
     }

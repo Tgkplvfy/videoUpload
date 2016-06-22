@@ -17,14 +17,14 @@ class ScopeRepository implements ScopeRepositoryInterface
      */
     public function getScopeEntityByIdentifier($scopeIdentifier)
     {
-        $scopes = [
-            'basic' => [
+        $scopes = array(
+            'basic' => array(
                 'description' => 'Basic details about you',
-            ],
-            'email' => [
+            ),
+            'email' => array(
                 'description' => 'Your email address',
-            ],
-        ];
+            ),
+        );
         if (array_key_exists($scopeIdentifier, $scopes) === false) {
             return;
         }

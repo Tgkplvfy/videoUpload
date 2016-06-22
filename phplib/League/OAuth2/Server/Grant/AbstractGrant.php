@@ -31,7 +31,7 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 abstract class AbstractGrant implements GrantTypeInterface
 {
-    use EmitterAwareTrait, CryptTrait;
+    # use EmitterAwareTrait, CryptTrait;
 
     const SCOPE_DELIMITER_STRING = ' ';
 
@@ -207,7 +207,7 @@ abstract class AbstractGrant implements GrantTypeInterface
             }
         );
 
-        $scopes = [];
+        $scopes = array();
         foreach ($scopesList as $scopeItem) {
             $scope = $this->scopeRepository->getScopeEntityByIdentifier($scopeItem);
 
@@ -248,7 +248,8 @@ abstract class AbstractGrant implements GrantTypeInterface
      */
     protected function getQueryStringParameter($parameter, ServerRequestInterface $request, $default = null)
     {
-        return isset($request->getQueryParams()[$parameter]) ? $request->getQueryParams()[$parameter] : $default;
+        $param = $request->getQueryParams();
+        return isset($param[$parameter]) ? $param[$parameter] : $default;
     }
 
     /**
@@ -262,7 +263,8 @@ abstract class AbstractGrant implements GrantTypeInterface
      */
     protected function getCookieParameter($parameter, ServerRequestInterface $request, $default = null)
     {
-        return isset($request->getCookieParams()[$parameter]) ? $request->getCookieParams()[$parameter] : $default;
+        $param = $request->getCookieParams();
+        return isset($param[$parameter]) ? $param[$parameter] : $default;
     }
 
     /**
@@ -276,7 +278,8 @@ abstract class AbstractGrant implements GrantTypeInterface
      */
     protected function getServerParameter($parameter, ServerRequestInterface $request, $default = null)
     {
-        return isset($request->getServerParams()[$parameter]) ? $request->getServerParams()[$parameter] : $default;
+        $param = $request->getServerParams();
+        return isset($param[$parameter]) ? $param[$parameter] : $default;
     }
 
     /**
@@ -293,13 +296,14 @@ abstract class AbstractGrant implements GrantTypeInterface
         \DateInterval $accessTokenTTL,
         ClientEntityInterface $client,
         $userIdentifier,
-        array $scopes = []
+        array $scopes = array()
     ) {
         $accessToken = $this->accessTokenRepository->getNewToken($client, $scopes, $userIdentifier);
         $accessToken->setClient($client);
         $accessToken->setUserIdentifier($userIdentifier);
         $accessToken->setIdentifier($this->generateUniqueIdentifier());
-        $accessToken->setExpiryDateTime((new \DateTime())->add($accessTokenTTL));
+        $dateObj = new \DateTime();
+        $accessToken->setExpiryDateTime($dateObj->add($accessTokenTTL));
 
         foreach ($scopes as $scope) {
             $accessToken->addScope($scope);
@@ -326,11 +330,12 @@ abstract class AbstractGrant implements GrantTypeInterface
         ClientEntityInterface $client,
         $userIdentifier,
         $redirectUri,
-        array $scopes = []
+        array $scopes = array()
     ) {
         $authCode = $this->authCodeRepository->getNewAuthCode();
         $authCode->setIdentifier($this->generateUniqueIdentifier());
-        $authCode->setExpiryDateTime((new \DateTime())->add($authCodeTTL));
+        $dateObj = new \DateTime();
+        $authCode->setExpiryDateTime($dateObj->add($authCodeTTL));
         $authCode->setClient($client);
         $authCode->setUserIdentifier($userIdentifier);
         $authCode->setRedirectUri($redirectUri);
@@ -353,7 +358,8 @@ abstract class AbstractGrant implements GrantTypeInterface
     {
         $refreshToken = $this->refreshTokenRepository->getNewRefreshToken();
         $refreshToken->setIdentifier($this->generateUniqueIdentifier());
-        $refreshToken->setExpiryDateTime((new \DateTime())->add($this->refreshTokenTTL));
+        $dateObj = new \DateTime();
+        $refreshToken->setExpiryDateTime($dateObj->add($this->refreshTokenTTL));
         $refreshToken->setAccessToken($accessToken);
 
         $this->refreshTokenRepository->persistNewRefreshToken($refreshToken);

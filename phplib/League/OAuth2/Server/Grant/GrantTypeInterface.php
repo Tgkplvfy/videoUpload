@@ -22,7 +22,8 @@ use Psr\Http\Message\ServerRequestInterface;
 /**
  * Grant type interface.
  */
-interface GrantTypeInterface extends EmitterAwareInterface
+// interface GrantTypeInterface extends EmitterAwareInterface
+interface GrantTypeInterface 
 {
     /**
      * Set refresh token TTL.
