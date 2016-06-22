@@ -39,17 +39,6 @@ class Ap_Base_Control extends Yaf_Controller_Abstract
 			$this->actions = array_merge($this->actions, $restActions);
 			$request->setActionName($controller . $method);
 
-			# 校验请求 token
-			if ( ! isset($_REQUEST['token']) OR strpos($_REQUEST['token'], ':') === -1) {
-				$this->response(NULL, 400, 'Invalid token !');
-			}
-
-			list($appkey, $signature) = explode(':', trim($_REQUEST['token']));
-			$appInfo = $this->_getAppInfo($appkey);
-
-			if ( ! $appInfo OR $signature != $appInfo['secret']) {
-				$this->response(NULL, 401, 'Invalid token !');
-			}
 		}
 	}
 
@@ -67,6 +56,22 @@ class Ap_Base_Control extends Yaf_Controller_Abstract
 		# cors settings
 		header('Access-Control-Allow-Origin: *');
 		exit($response);
+	}
+
+	# 检验请求是否合法
+	public function verifyRequest () 
+	{
+		# 校验请求 token
+		if ( ! isset($_REQUEST['token']) OR strpos($_REQUEST['token'], ':') === -1) {
+			$this->response(NULL, 400, 'Invalid token !');
+		}
+
+		list($appkey, $signature) = explode(':', trim($_REQUEST['token']));
+		$appInfo = $this->_getAppInfo($appkey);
+
+		if ( ! $appInfo OR $signature != $appInfo['secret']) {
+			$this->response(NULL, 401, 'Invalid token !');
+		}
 	}
 	
 
