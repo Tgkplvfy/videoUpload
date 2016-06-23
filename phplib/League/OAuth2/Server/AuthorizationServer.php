@@ -113,7 +113,7 @@ class AuthorizationServer
         $grantType->setScopeRepository($this->scopeRepository);
         $grantType->setPrivateKey($this->privateKey);
         $grantType->setPublicKey($this->publicKey);
-        $grantType->setEmitter($this->getEmitter());
+        // $grantType->setEmitter($this->getEmitter());
 
         $this->enabledGrantTypes[$grantType->getIdentifier()] = $grantType;
         $this->grantTypeAccessTokenTTL[$grantType->getIdentifier()] = $accessTokenTTL;

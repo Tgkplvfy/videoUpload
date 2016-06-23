@@ -3,7 +3,7 @@
 /**
  * 视频上传
  */
-class VideoPutAction extends Ap_Base_Action 
+class TestuploadAction extends Ap_Base_Action 
 {
     const MONGO_VIDEO_DB        = 'storage';
     const MONGO_TBL_VIDEO       = 'video';
@@ -95,112 +95,85 @@ class VideoPutAction extends Ap_Base_Action
         $apMongo  = new Ap_DB_MongoDB ();
         $videoTbl = $apMongo->getCollection(self::MONGO_TBL_VIDEO);
 
-        $files    = array();
-        
+        $files      = array();
+        $imgAdapter = new Ap_ImageAdapter ();
         foreach ($savedFiles as $file) 
         {
-            $mongoFile = isset($file['saved']) ? $file['mongo'] : $this->__saveMainFile($file);
-            $this->__saveBucketVideo($bucketid, $title, '', $mongoFile['_id']); # 保存上传记录
+            # 缩略图文件转储到MongoDB并更新字段值
+            $picHashKey = $imgAdapter->write($file['pic']);
+            $videoThumb = $imgAdapter->getURL($picHashKey, '720', '480');
+            $mongoData  = array(
+                '_id'       => new MongoId(), 
+                // 'bucket_id' => 'www', 
+                'filename'  => $file['saveas'], 
+                'size'      => $file['size'], 
+                'mime_type' => $file['mime_type'], 
+                'md5_file'  => $file['md5'], 
+                'pic'       => $videoThumb, 
+                'watermark' => '', 
+                'duration'  => $file['duration'] 
+                // 'fragment'  => $transcode 
+            );
 
-            if (isset($file['pic']) && file_exists($file['pic'])) unlink($file['pic']); # 删除临时缩略图文件
-
-            # 存储需要转码的文件信息
-            foreach ($transcode as $trans) {
-                $transFile = $videoTbl->findOne(array('transType' => $trans['type'], 'src_id' => $mongoFile['_id']));
-                if ( ! $transFile) {
-                    $transFile = array(
-                        # 原始文件信息
-                        '_id'      => new MongoId(), 
-                        'src_id'   => $mongoFile['_id'], 
-                        'filename' => $file['saveas'], 
-                        # 文件基本信息
-                        'title'     => $title, 
-                        'size'      => 0, 
-                        'mime_type' => $trans['mime_type'], 
-                        'md5_file'  => '', 
-                        'pic'       => $mongoFile['pic'], 
-                        'duration'  => $file['duration'], 
-                        # 文件转码信息
-                        "transType"          => $trans['type'], 
-                        "fps"                => $trans['fps'], 
-                        "audio_bps"          => $trans['audio_bps'], 
-                        "video_bps"          => $trans['video_bps'], 
-                        "width"              => $trans['width'], 
-                        "height"             => $trans['height'], 
-                        "encrypt"            => $trans['encrypt'], 
-                        "status"             => self::TRANSCODE_JOB_WAITING, 
-                        "convert_begin_time" => '', 
-                        "convert_end_time"   => '', 
-                        "proc_id"            => '', 
-                        "secret_key"         => '', 
-                        "fragment_duration"  => '', 
-                        "fragments"          => '' 
-                    );
-                    $videoTbl->save($transFile);
-                }
-
-                # 如果已经保存过转码文件记录，不再记录！
-                $this->__saveBucketVideo($bucketid, $title, $mongoFile['_id'], $transFile['_id']);
-            }
-
-            $files[] = $mongoFile;
-        }
-
-        return $files;
-    }
-
-    # 保存主文件
-    private function __saveMainFile ($file) 
-    {
-        # 缩略图文件转储到MongoDB并更新字段值
-        $imgAdapter = new Ap_ImageAdapter ();
-        $picHashKey = $imgAdapter->write($file['pic']);
-        $videoThumb = $imgAdapter->getURL($picHashKey, '720', '480');
-        $mongoData  = array(
-            '_id'       => new MongoId(), 
-            // 'bucket_id' => 'www', 
-            'filename'  => $file['saveas'], 
-            'size'      => $file['size'], 
-            'mime_type' => $file['mime_type'], 
-            'md5_file'  => $file['md5'], 
-            'pic'       => $videoThumb, 
-            'watermark' => '', 
-            'duration'  => $file['duration'] 
-            // 'fragment'  => $transcode 
-        );
-
-        $apMongo  = new Ap_DB_MongoDB ();
-        $apMongo->getCollection(self::MONGO_TBL_VIDEO)->save($mongoData);
-        
-        return $mongoData;
-    }
-
-    # 保存转码文件
-    private function __saveTranFile () 
-    {
-        // 
-    }
-
-    # 保存视频文件
-    private function __saveBucketVideo ($bucketid, $title, $src_video_id, $dst_video_id) 
-    {
-        $apMongo = new Ap_DB_MongoDB();
-        $where = array(
-            'bucket_id'    => $bucketid, 
-            'title'        => $title, 
-            'dst_video_id' => $dst_video_id
-        );
-
-        $tblBVideo = $apMongo->getCollection(self::MONGO_TBL_BUCKETVIDEO);
-        if ( ! $tblBVideo->findOne($where)) {
-            return $tblBVideo->save(array(
+            $videoTbl->save($mongoData);
+            $apMongo->getCollection(self::MONGO_TBL_BUCKETVIDEO)->save(array(
                 '_id'          => new MongoId(), 
                 'bucket_id'    => $bucketid, 
                 'title'        => $title, 
-                'src_video_id' => $src_video_id, 
-                'dst_video_id' => $dst_video_id 
+                'src_video_id' => $mongoData['_id'], 
+                'dst_video_id' => '' 
             ));
+            if (file_exists($file['pic'])) unlink($file['pic']); # 删除临时缩略图文件
+
+            # 存储需要转码的文件信息
+            foreach ($transcode as $trans) {
+                $transed = $videoTbl->findOne(array('transType' => $trans['type'], 'src_id' => $mongoData['_id']));
+                if ($transed) continue;
+
+                $transFile = array(
+                    # 原始文件信息
+                    '_id'      => new MongoId(), 
+                    'src_id'   => $mongoData['_id'], 
+                    'filename' => $file['saveas'], 
+                    # 文件基本信息
+                    'title'     => $title, 
+                    'size'      => 0, 
+                    'mime_type' => $trans['mime_type'], 
+                    'md5_file'  => '', 
+                    'pic'       => $videoThumb, 
+                    'duration'  => $file['duration'], 
+                    # 文件转码信息
+                    "transType"          => $trans['type'], 
+                    "fps"                => $trans['fps'], 
+                    "audio_bps"          => $trans['audio_bps'], 
+                    "video_bps"          => $trans['video_bps'], 
+                    "width"              => $trans['width'], 
+                    "height"             => $trans['height'], 
+                    "encrypt"            => $trans['encrypt'], 
+                    "status"             => self::TRANSCODE_JOB_WAITING, 
+                    "convert_begin_time" => '', 
+                    "convert_end_time"   => '', 
+                    "proc_id"            => '', 
+                    "secret_key"         => '', 
+                    "fragment_duration"  => '', 
+                    "fragments"          => '' 
+                );
+
+                # 删除临时缩略图文件
+                $videoTbl->save($transFile);
+                $apMongo->getCollection(self::MONGO_TBL_BUCKETVIDEO)->save(array(
+                    '_id'          => new MongoId(), 
+                    'bucket_id'    => $bucketid, 
+                    'title'        => $title, 
+                    'src_video_id' => $mongoData['_id'], 
+                    'dst_video_id' => $transFile['_id'] 
+                ));
+            }
+
+            $files[] = $mongoData;
         }
+
+        return $files;
     }
 
     # 加入转码队列

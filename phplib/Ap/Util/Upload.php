@@ -85,14 +85,14 @@ class Ap_Util_Upload
 			//如果当前文件上传成功，则执行下一步。
 			if ( $this->user_post_file['error'][$i] == 0 )
 			{
-				//取当前文件名、临时文件名、大小、扩展名，后面将用到。
+				// 取当前文件名、临时文件名、大小、扩展名，后面将用到。
 				$name      = $this->user_post_file['name'][$i];
 				$tmpname   = $this->user_post_file['tmp_name'][$i];
 				$size      = $this->user_post_file['size'][$i];
 				$mime_type = $this->user_post_file['type'][$i];
 				$type      = $this->__getFileExt( $this->user_post_file['name'][$i] );
 
-				//检测当前上传文件大小是否合法。
+				// 检测当前上传文件大小是否合法。
 				if ( !$this->__checkSize($size) )
 				{
 					$this->last_error = "The file size is too big. File name is: {$name}";
@@ -100,7 +100,7 @@ class Ap_Util_Upload
 					continue;
 				}
 
-				//检测当前上传文件扩展名是否合法。
+				// 检测当前上传文件扩展名是否合法。
 				if (!$this->__checkType( $type ) )
 				{
 					$this->last_error = "Unallowable file type: ."  .$type . " File name is: " . $name;
@@ -108,11 +108,21 @@ class Ap_Util_Upload
 					continue;
 				}
 
-				//检测当前上传文件是否非法提交。
+				// 检测当前上传文件是否非法提交。
 				if( ! is_uploaded_file( $tmpname ) )
 				{
 					$this->last_error = "Invalid post file method. File name is: " . $name;
 					$this->__halt( $this->last_error );
+					continue;
+				}
+
+				// 检测文件是否已在服务器存在，存在获取信息，跳过上传过程
+				$duplicate = $this->__fileDuplicate(md5_file($tmpname));
+				if ($duplicate !== FALSE) {
+					$this->save_info[] = array(
+						"mongo"     => $duplicate, 
+						"saved"     => TRUE 
+					);
 					continue;
 				}
 
@@ -234,10 +244,13 @@ class Ap_Util_Upload
 	} // end func
 
 
-	// 获取文件的附加信息 TODO
-	private function __getVideoInfo ($file) 
+	// 检查文件是否已经存在
+	private function __fileDuplicate ($md5) 
 	{
-		// 
+		$apMongo   = new Ap_DB_MongoDB();
+		$duplicate = $apMongo->getCollection('video')->findOne(array('md5_file' => $md5));
+
+		return $duplicate ? $duplicate : FALSE;
 	}
     
 } // end class

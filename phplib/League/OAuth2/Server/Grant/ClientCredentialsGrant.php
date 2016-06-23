@@ -10,6 +10,7 @@
  */
 namespace League\OAuth2\Server\Grant;
 
+use League\OAuth2\Server\CryptKey;
 use League\OAuth2\Server\ResponseTypes\ResponseTypeInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -49,4 +50,8 @@ class ClientCredentialsGrant extends AbstractGrant
     {
         return 'client_credentials';
     }
+
+    public function setPrivateKey (CryptKey $privateKey) {}
+
+    public function setPublicKey (CryptKey $publicKey) {}
 }

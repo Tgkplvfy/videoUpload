@@ -17,7 +17,7 @@ use OAuth2\Server\Repositories\ScopeRepository;
 class Ap_Base_Control extends Yaf_Controller_Abstract
 {
 	# OAuth 2.0 服务
-	protected $_oauthServer;
+	// protected $_oauthServer;
 
 	public $actions = array();
 	
@@ -52,7 +52,8 @@ class Ap_Base_Control extends Yaf_Controller_Abstract
 			$request->setActionName($controller . $method);
 		}
 
-		// $this->getOAuthServer();
+		if ($controller != 'demo')
+			$this->verifyRequest();
 	}
 
 	# 接口返回数据 JSON 格式
@@ -86,29 +87,27 @@ class Ap_Base_Control extends Yaf_Controller_Abstract
 		if ( ! $appInfo OR $signature != $appInfo['secret']) {
 			$this->response(NULL, 401, 'Invalid token !');
 		}
+
+		return TRUE;
 	}
 
 	# 获取当前请求的APP信息
 	private function _getAppInfo ($appkey = '') 
 	{
-		$MongoDB    = new Ap_DB_MongoDB ();
-		$collection = $MongoDB->getCollection('auth_keys');
+		$MongoDB = new Ap_DB_MongoDB ();
+		$appInfo = $MongoDB->getCollection('auth_keys')->findOne(array('appkey' => $appkey));
 
-		$appInfo = $collection->findOne(array('appkey'=>$appkey));
-
+		# 添加测试appkey和secret
+		if ( ! $MongoDB->getCollection('auth_keys')->findOne(array('appkey' => 'imooc'))) 
+		{
+			$MongoDB->getCollection('auth_keys')->save(array(
+				'_id' => new MongoId(), 
+				'uid' => 1, 
+				'appkey' => 'imooc', 
+				'secret' => 'upload'
+			));
+		}
 		return $appInfo ? $appInfo : FALSE;
-	}
-
-	# initialize an oauth server SHOULD USE *DI*
-	public function getOAuthServer () 
-	{
-        $clientRepository      = new ClientRepository();       // instance of ClientRepositoryInterface
-        $scopeRepository       = new ScopeRepository();        // instance of ScopeRepositoryInterface
-        $accessTokenRepository = new AccessTokenRepository();  // instance of AccessTokenRepositoryInterface
-
-		$server = new AuthorizationServer();
-		$server->enableGrantType('client_credentials');
-		$this->_oauthServer = $server;
 	}
 
 }
