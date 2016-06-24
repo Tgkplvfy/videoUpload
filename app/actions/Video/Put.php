@@ -186,61 +186,11 @@ class VideoPutAction extends Ap_Base_Action
 
         # 每个文件执行所有转码任务
         foreach ($files as $file) {
-            $job = $this->createJobs($file);
+            $job = Ap_Service_Gearman::createVideoJobs($file);
             if ( ! $job) continue;
         }
 
         return TRUE;
-    }
-
-    /**
-     * @func 创建任务队列
-     * @param $files 要转码的文件列表
-     * @param $param 转码设定的参数
-     *
-     * @return boolean 创建成功状态
-     */
-    private function createJobs ($file) 
-    {
-        $gmclient = new GearmanClient();
-        $gmclient->addServer($_SERVER['GEARMAN_HOST'], $_SERVER['GEARMAN_PORT']);
-
-        $apMongo = new Ap_DB_MongoDB();
-        $pengingJobs = $apMongo->getCollection(Ap_Vars::MONGO_TBL_VIDEO)->find(array(
-            'src_id' => $file['_id'], 
-            'status' => Ap_Vars::FILESTATUS_SAVED 
-        ));
-        $jobs = iterator_to_array($pengingJobs);
-        if (empty($jobs)) return TRUE;
-
-        foreach ($jobs as $job) {
-            $fragment = array (
-                'mime_type' => $job['mime_type'], 
-                'fps'       => $job['fps'], 
-                'audio_bps' => $job['audio_bps'], 
-                'video_bps' => $job['video_bps'], 
-                'width'     => $job['width'], 
-                'height'    => $job['height'], 
-                'encrypt'   => $job['encrypt']
-            );
-
-            $uniqKey  = (string) $job['_id'];
-            $workload = json_encode(array('_id' => $uniqKey, 'fragment' => $fragment));
-
-            try {
-                $result  = $gmclient->doBackground(Ap_Vars::GEARMAN_FUN_DEFAULT, $workload, $uniqKey);
-                if (!$result) {
-                    sleep(1);
-                    $result = $gmclient->doBackground(Ap_Vars::GEARMAN_FUN_DEFAULT, $workload, $uniqKey);
-                    if(!$result){
-                        $errno = $gmclient->getErrno();
-                        // Ap_Log::log($errno . ':' . $gmclient->error());
-                    }
-                }
-            } catch (Exception $e) {
-                // Ap_Log::log($e->getMessage());
-            }
-        }
     }
 
 }

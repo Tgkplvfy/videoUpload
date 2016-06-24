@@ -22,6 +22,8 @@ class DemoGetAction extends Ap_Base_Action
             // 'target' => json_encode(self::$transParams)
         );
 
+        $test = Ap_Vars::MONGODB_TBL_VIDEO;
+
         $this->getView()->assign("params", $params);
         $this->getView()->assign("action", $action);
         $this->getView()->display('demo/index.phtml');

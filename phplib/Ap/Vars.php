@@ -9,10 +9,13 @@ class Ap_Vars {
     # MongoDB 相关
     const MONGO_VIDEO_DB        = 'storage';
     const MONGO_TBL_VIDEO       = 'video';
-    const MONGO_TBL_BUCKETVIDEO = 'bucketvideo';
+    const MONGO_TBL_BUCKETVIDEO = 'bucket_video';
 
     # Gearman 相关
     const GEARMAN_FUN_DEFAULT    = 'imooc_video_convert'; # Gearman 默认转码任务
+
+    # fastDFS 相关
+    const FASTDFS_FAIL_DIRECTORY = '/storage/fails/';    # fastDFS 转储失败后，fallback目录
 
     # 文件上传状态
     const FILESTATUS_UPLOADED = 1;   # 已上传（未保存到文件系统）

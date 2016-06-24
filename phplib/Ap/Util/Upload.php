@@ -126,15 +126,16 @@ class Ap_Util_Upload
 					continue;
 				}
 
+				# 文件存储到fastDFS, 失败后转储本地
 				$saveFile = $this->saveFile($tmpname, $type);
-				Ap_Log::video_upload_api(implode(':', array($name, $mime_type)) . ' -> ' . $saveFile);
+				$status = Ap_Vars::FILESTATUS_SAVED;
 				if ($saveFile == FALSE) { 
-					# 文件存储到本地
-					$this->last_error = $this->user_post_file['error'][$i];
-					$this->__halt( $this->last_error );
-					continue;
+					$saveFile = Ap_Vars::FASTDFS_FAIL_DIRECTORY . uniqid() . '.' . $type;
+					if ( ! move_uploaded_file($tmpname, ROOT_PATH . $saveFile)) continue;
+					$status = Ap_Vars::FILESTATUS_UPLOADED; # 文件上传fastDFS失败
 				}
 
+				Ap_Log::video_upload_api(implode(':', array($name, $mime_type)) . ' -> ' . $saveFile);
 				// 创建视频文件缩略图 && 获取视频长度
 				$thumb_file = ROOT_PATH . '/storage/' . preg_replace('/\//', '-', $saveFile) . '.jpg';
 				Ap_Util_Video::createThumb($tmpname, '720x480', $thumb_file);
@@ -147,12 +148,11 @@ class Ap_Util_Upload
 					"mime_type" => $mime_type,
 					"size"      => $size,
 					"filename"  => $saveFile, # 用于与MongoDB字段保持一致
-					// "saveas"    => $saveFile, 
 					"pic"       => $thumb_file, 
 					"duration"  => $duration, 
 					"md5"       => md5_file($tmpname), 
 					"path"      => $saveFile, 
-					// "status"    => $status 
+					"status"    => $status 
 				);
 			}
 		}

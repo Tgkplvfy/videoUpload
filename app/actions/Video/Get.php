@@ -18,16 +18,15 @@ class VideoGetAction extends Ap_Base_Action
         $pagesize = isset($_GET['pagesize']) ? (int) $_GET['pagesize'] : 20;
 
         # 获取搜索参数
-        $apMongo   = new Ap_DB_MongoDB ();
-        $tblVideo  = $apMongo->getCollection(Ap_Vars::MONGO_TBL_VIDEO);
-        $tblBVideo = $apMongo->getCollection(Ap_Vars::MONGO_TBL_BUCKETVIDEO);
+        $m_video       = new Ap_Model_Video();
+        $m_bucketvideo = new Ap_Model_BucketVideo();
 
         $where = array('bucket_id' => $token[0], 'src_video_id'=>'');
         if ($search) $where['title'] = new MongoRegex("/{$search}/");
         if ($ids) $where['dst_video_id'] = array('$in' => $ids);
         
-        $total = $tblBVideo->find($where)->count();
-        $list  = $tblBVideo->find($where)
+        $total = $m_bucketvideo->getCount($where);
+        $list  = $m_bucketvideo->Collection->find($where)
             ->limit($pagesize)
             ->skip(($page - 1)*$pagesize)
             ->sort(array('_id'=>1));
@@ -36,11 +35,10 @@ class VideoGetAction extends Ap_Base_Action
         $vlist = array();
         foreach ($list as $item) {
             $v_id = $item['dst_video_id'];
-            $info = $tblVideo->findOne(array('_id'=>$v_id));
+            $info = $m_video->getOneById($v_id);
             if ( ! $info) continue;
 
-            $subs = $tblVideo->find(array('src_id'=>$v_id));
-            $info['subfiles'] = iterator_to_array($subs);
+            $info['subfiles'] = $m_video->getMany(array('src_id'=>$v_id));
             $vlist = $info;
         }
 
