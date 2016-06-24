@@ -11,6 +11,13 @@ class VideoPutAction extends Ap_Base_Action
 
     const GEARMAN_FUN_DEFAULT    = 'imooc_video_convert'; # Gearman 默认转码任务
 
+    const FILESTATUS_UPLOADED = 1;   # 已上传（未保存到文件系统）
+    const FILESTATUS_SAVED    = 2;   # 以保存到文件系统
+    const FILESTATUS_QUEUEING = 3;   # 转码队列排队中
+    const FILESTATUS_TRANSING = 4;   # 转码中
+    const FILESTATUS_TRANSED  = 5;   # 转码成功
+    const FILESTATUS_FINISHED = 6;   # 转码成功并保存成功
+
     const TRANSCODE_JOB_WAITING =  1;   # 转码等待开始（未开始）
     const TRANSCODE_JOB_STARTED =  2;   # 转码队列进行中
     const TRANSCODE_JOB_DONE    =  3;   # 转码完成
