@@ -8,6 +8,7 @@
 
 class VideoGetAction extends Ap_Base_Action 
 {
+
     public function execute () 
     {
         $token    = isset($_REQUEST['token']) ? explode(':', trim($_REQUEST['token'])) : '';
@@ -17,31 +18,34 @@ class VideoGetAction extends Ap_Base_Action
         $pagesize = isset($_GET['pagesize']) ? (int) $_GET['pagesize'] : 20;
 
         # 获取搜索参数
-        $apMongo    = new Ap_DB_MongoDB ();
-        $collection = $apMongo->getCollection('bucketvideo');
+        $apMongo   = new Ap_DB_MongoDB ();
+        $tblVideo  = $apMongo->getCollection(Ap_Vars::MONGO_TBL_VIDEO);
+        $tblBVideo = $apMongo->getCollection(Ap_Vars::MONGO_TBL_BUCKETVIDEO);
 
         $where = array('bucket_id' => $token[0], 'src_video_id'=>'');
         if ($search) $where['title'] = new MongoRegex("/{$search}/");
         if ($ids) $where['dst_video_id'] = array('$in' => $ids);
         
-        $total = $collection->find($where)->count();
-        
-        $list = $collection->find($where)
+        $total = $tblBVideo->find($where)->count();
+        $list  = $tblBVideo->find($where)
             ->limit($pagesize)
             ->skip(($page - 1)*$pagesize)
             ->sort(array('_id'=>1));
 
-        $list = iterator_to_array($list);
+        # 获取视频信息
+        $vlist = array();
         foreach ($list as $item) {
-            $vids[] = $item['dst_video_id'];
+            $v_id = $item['dst_video_id'];
+            $info = $tblVideo->findOne(array('_id'=>$v_id));
+            if ( ! $info) continue;
+
+            $subs = $tblVideo->find(array('src_id'=>$v_id));
+            $info['subfiles'] = iterator_to_array($subs);
+            $vlist = $info;
         }
 
-        $vlist = $apMongo->getCollection('video')->find(array(
-            '_id' => array ('$in' => $vids)
-        ));
-
         $this->response(array(
-            'list' => iterator_to_array($vlist), 
+            'list' => $vlist, 
             'page' => $page, 
             'pagesize' => $pagesize, 
             'total' => $total

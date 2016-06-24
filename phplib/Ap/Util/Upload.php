@@ -9,7 +9,7 @@
  * @access       public\
  * @date		 2013/6/3
  * <code>
- * 多文件上传:<input type="file" name="file[]">
+ * 多文件上传:<input type="file" name="files[]">
  * //命名方式
  * Ap_Util_Upload::$sNameing = 'uniqid'; 
  * $up = new Ap_Util_Upload( $_FILES['file'] , Ap_Constants::VIDEO_SAVE_PATH, $allow_type, $max_size );
@@ -73,7 +73,7 @@ class Ap_Util_Upload
 	 * 存储用户上传文件，检验合法性通过后，存储至指定位置。
 	 * @access public
 	 * @param string $input_name
-	 * @return int 值为0时上传失败，非0表示上传成功的个数。
+	 * @return boolean TRUE 成功 FALSE 失败
 	 */
 	public function upload()
 	{
@@ -128,16 +128,16 @@ class Ap_Util_Upload
 
 				$saveFile = $this->saveFile($tmpname, $type);
 				Ap_Log::video_upload_api(implode(':', array($name, $mime_type)) . ' -> ' . $saveFile);
-				if ($saveFile == FALSE) {
+				if ($saveFile == FALSE) { 
+					# 文件存储到本地
 					$this->last_error = $this->user_post_file['error'][$i];
 					$this->__halt( $this->last_error );
 					continue;
 				}
 
-				// 创建视频文件缩略图
+				// 创建视频文件缩略图 && 获取视频长度
 				$thumb_file = ROOT_PATH . '/storage/' . preg_replace('/\//', '-', $saveFile) . '.jpg';
 				Ap_Util_Video::createThumb($tmpname, '720x480', $thumb_file);
-
 				$duration   = Ap_Util_Video::getLong($tmpname);
 
 				//存储当前文件的有关信息，以便其它程序调用。
@@ -146,17 +146,18 @@ class Ap_Util_Upload
 					"type"      => $type,
 					"mime_type" => $mime_type,
 					"size"      => $size,
-					"saveas"    => $saveFile, 
+					"filename"  => $saveFile, # 用于与MongoDB字段保持一致
+					// "saveas"    => $saveFile, 
 					"pic"       => $thumb_file, 
 					"duration"  => $duration, 
 					"md5"       => md5_file($tmpname), 
-					"path"      => $saveFile
+					"path"      => $saveFile, 
+					// "status"    => $status 
 				);
 			}
 		}
 
 		$this->succ_num = count( $this->save_info ); //返回上传成功的文件数目
-
 		return $this->succ_num > 0 ? TRUE : FALSE;
 	}
 
