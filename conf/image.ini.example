@@ -1,11 +1,11 @@
 [product]
-application.directory = APP_PATH "/app/"
+application.directory = ROOT_PATH "/app/"
 storage_path = /data/storage
 
 image.lifetime = 315360000
 image.quality = 80
-image.default = APP_PATH "/images/default.jpg"
-image.default_head = APP_PATH "/images/avatar_default.png"
+image.default = ROOT_PATH "/images/default.jpg"
+image.default_head = ROOT_PATH "/images/avatar_default.png"
 ;image.url = http://dximg.imooc.com/
 image.url = http://img.mukewang.com/
 image.api = http://dximg.imooc.com/api/
