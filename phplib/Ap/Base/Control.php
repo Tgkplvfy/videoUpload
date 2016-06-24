@@ -77,7 +77,7 @@ class Ap_Base_Control extends Yaf_Controller_Abstract
 	public function verifyRequest () 
 	{
 		# 校验请求 token
-		if ( ! isset($_REQUEST['token']) OR strpos($_REQUEST['token'], ':') === -1) {
+		if ( ! isset($_REQUEST['token']) OR strpos($_REQUEST['token'], ':') === FALSE) {
 			$this->response(NULL, 400, 'Invalid token !');
 		}
 
