@@ -147,6 +147,7 @@ class VideoPutAction extends Ap_Base_Action
             'md5_file'  => $file['md5'], 
             'pic'       => $videoThumb, 
             'watermark' => '', 
+            'status'    => $file['status'], 
             'duration'  => $file['duration'] 
             // 'fragment'  => $transcode 
         );
