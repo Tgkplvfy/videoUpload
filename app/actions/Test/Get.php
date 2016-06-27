@@ -8,7 +8,8 @@ class TestGetAction extends Ap_Base_Action
         0 => 'testHello', 
         1 => 'testMongo', 
         2 => 'testGearman', 
-        3 => 'testToken'
+        3 => 'testToken', 
+        4 => 'testPhp'
     );
 
     public function execute () 
@@ -74,6 +75,11 @@ class TestGetAction extends Ap_Base_Action
 
         echo 'hash_hmac: ' . $secret_hash . '<br />';
         echo 'base64: ' . base64_encode($secret_hash) . '<br />';
+    }
+
+    public function testPhp () 
+    {
+        phpinfo();
     }
 
 }
