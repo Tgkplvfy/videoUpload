@@ -132,7 +132,8 @@ class Ap_Util_Upload
 				if ($saveFile == FALSE) { 
 					$saveFile = Ap_Vars::FASTDFS_FAIL_DIRECTORY . uniqid() . '.' . $type;
 					if ( ! move_uploaded_file($tmpname, ROOT_PATH . $saveFile)) continue;
-					$status = Ap_Vars::FILESTATUS_UPLOADED; # 文件上传fastDFS失败
+					$status  = Ap_Vars::FILESTATUS_UPLOADED; # 文件上传fastDFS失败
+					$tmpname = ROOT_PATH . $saveFile;        # 防止下面程序找不到$tmpname
 				}
 
 				Ap_Log::video_upload_api(implode(':', array($name, $mime_type)) . ' -> ' . $saveFile);
