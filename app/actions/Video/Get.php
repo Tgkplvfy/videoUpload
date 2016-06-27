@@ -38,8 +38,9 @@ class VideoGetAction extends Ap_Base_Action
             $info = $m_video->getOneById($v_id);
             if ( ! $info) continue;
 
+            $info['stringid'] = (string) $item['_id']; # 增加字符串类型ID便于前段读取
             $info['subfiles'] = $m_video->getMany(array('src_id'=>$v_id));
-            $vlist = $info;
+            $vlist[] = $info;
         }
 
         $this->response(array(
