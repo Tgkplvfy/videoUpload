@@ -11,26 +11,30 @@ class Ap_Service_Gearman {
 
     public function __construct ($host = '', $port = '') 
     {
-        try {
-            $this->_client = new GearmanClient();
-    		$this->_client->addServers($host, $port);
-        } catch (Exception $e) {
-            // Ap_Log::log($e->getMessage());
-        }
+        // try {
+        //     $this->_client = new GearmanClient();
+    	// 	$this->_client->addServers($host, $port);
+        // } catch (Exception $e) {
+        //     // Ap_Log::log($e->getMessage());
+        // }
     }
 
     # 添加视频转码任务
     public static function createVideoJobs ($file) 
     {
         $gmclient = new GearmanClient();
-        $gmclient->addServer($_SERVER['GEARMAN_HOST'], $_SERVER['GEARMAN_PORT']);
+        $config   = new Yaf_Config_Ini(ROOT_PATH . '/conf/gearman.ini', 'product');
+        $host = isset($_SERVER['GEARMAN_HOST']) ? $_SERVER['GEARMAN_HOST'] : $config->get('host');
+        $port = isset($_SERVER['GEARMAN_PORT']) ? $_SERVER['GEARMAN_PORT'] : $config->get('port');
+
+        $gmclient->addServer($host, $port);
 
         $apMongo = new Ap_DB_MongoDB();
-        $pengingJobs = $apMongo->getCollection(Ap_Vars::MONGO_TBL_VIDEO)->find(array(
+        $pendingJobs = $apMongo->getCollection(Ap_Vars::MONGO_TBL_VIDEO)->find(array(
             'src_id' => $file['_id'], 
             'status' => Ap_Vars::FILESTATUS_SAVED 
         ));
-        $jobs = iterator_to_array($pengingJobs);
+        $jobs = iterator_to_array($pendingJobs);
         if (empty($jobs)) return TRUE;
 
         foreach ($jobs as $job) {
