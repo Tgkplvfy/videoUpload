@@ -110,7 +110,7 @@ class VideoPutAction extends Ap_Base_Action
                         "width"              => $trans['width'], 
                         "height"             => $trans['height'], 
                         "encrypt"            => $trans['encrypt'], 
-                        "status"             => Ap_Vars::FILESTATUS_SAVED, 
+                        "status"             => $file['status'], 
                         "convert_begin_time" => '', 
                         "convert_end_time"   => '', 
                         "proc_id"            => '', 
