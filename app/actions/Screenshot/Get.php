@@ -15,7 +15,7 @@ class ScreenshotGetAction extends Ap_Base_Action
             $this->response(NULL, 400, '没有找到视频！');
         
         $file = $video['filename'];
-        $_src = 'http://video.mukewang.com/' . $video['filename'];
+        $_src = 'http://video.mukewang.com/' . $video['filename']; # @todo: 修改为从本地读取视频数据
         $path = ROOT_PATH . '/storage/' . "{$videoId}_{$seekPos}.jpg";
 
         $utilVideo = new Ap_Util_Video();
