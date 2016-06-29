@@ -3,7 +3,12 @@
 application.directory = ROOT_PATH "/app/"
 application.library   = ROOT_PATH "/phplib/"
 
-;application.modules=Index,Bucket,Video
+;API接口使用的认证方式: none, secret, signature, oauth
+; none:      不使用接口请求验证
+; secret:    使用明文密码验证{token=appkey:secret}
+; signature: 使用参数hash签名验证{token=appkey:signature}
+; oauth:     使用OAuth2.0方式验证{access_token=xxxxxx}
+application.apiauth = secret
 
 [dev]
 application.directory = ROOT_PATH "/app/"
