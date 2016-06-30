@@ -29,7 +29,7 @@ class VideoGetAction extends Ap_Base_Action
         $list  = $m_bucketvideo->Collection->find($where)
             ->limit($pagesize)
             ->skip(($page - 1)*$pagesize)
-            ->sort(array('_id'=>1));
+            ->sort(array('_id'=>-1));
 
         # 获取视频信息
         $vlist = array();
@@ -38,6 +38,7 @@ class VideoGetAction extends Ap_Base_Action
             $info = $m_video->getOneById($v_id);
             if ( ! $info) continue;
 
+            $info['title']    = $item['title'];        # 增加字符串类型ID便于前段读取
             $info['stringid'] = (string) $item['_id']; # 增加字符串类型ID便于前段读取
             $info['subfiles'] = $m_video->getMany(array('src_id'=>$v_id));
             $vlist[] = $info;
