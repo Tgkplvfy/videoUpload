@@ -8,17 +8,14 @@
  * ------------------------------------------------
  */
 
-use League\OAuth2\Server\AuthorizationServer;
-use League\OAuth2\Server\ResourceServer;
-use OAuth2\Server\Repositories\AccessTokenRepository;
-use OAuth2\Server\Repositories\ClientRepository;
-use OAuth2\Server\Repositories\ScopeRepository;
+// use League\OAuth2\Server\AuthorizationServer;
+// use League\OAuth2\Server\ResourceServer;
+// use OAuth2\Server\Repositories\AccessTokenRepository;
+// use OAuth2\Server\Repositories\ClientRepository;
+// use OAuth2\Server\Repositories\ScopeRepository;
 
 class Ap_Base_Control extends Yaf_Controller_Abstract
 {
-	# OAuth 2.0 服务
-	// protected $_oauthServer;
-
 	public $actions = array();
 	
 	// init Restful API request dispatch
