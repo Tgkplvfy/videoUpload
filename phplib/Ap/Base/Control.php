@@ -84,6 +84,25 @@ class Ap_Base_Control extends Yaf_Controller_Abstract
 		list($appkey, $signature) = explode(':', trim($_REQUEST['token']));
 		$appInfo = $this->_getAppInfo($appkey);
 
+		$verifyType = 'secret';
+		switch ($verifyType) 
+		{
+			case 'none':
+				return TRUE;
+				break;
+
+			case 'secret':
+				break;
+				
+			case 'signature':
+				break;
+				
+			case 'oauth':
+				break;
+				
+			default:
+				break;
+		}
 		if ( ! $appInfo OR $signature != $appInfo['secret']) {
 			$this->response(NULL, 401, 'Invalid token !');
 		}
