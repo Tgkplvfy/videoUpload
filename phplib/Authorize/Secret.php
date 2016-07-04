@@ -1,16 +1,16 @@
 <?php 
 
-class Ap_Authorize_Secret 
+class Authorize_Secret 
 {
     // 校验请求是否合法
-    public function verifyRequest () 
+    public static function verifyRequest () 
     {
 		# 校验请求 token
 		if ( ! isset($_REQUEST['token']) OR strpos($_REQUEST['token'], ':') === FALSE) 
 			return FASLE;
 
 		list($appkey, $secret) = explode(':', trim($_REQUEST['token']));
-		$appInfo = $this->_getAppInfo($appkey);
+		$appInfo = self::_getAppInfo($appkey);
 
 		if ( ! $appInfo OR $secret != $appInfo['secret']) 
 			return FALSE;
@@ -19,7 +19,7 @@ class Ap_Authorize_Secret
     }
 
 	# 获取当前请求的APP信息
-	private function _getAppInfo ($appkey = '') 
+	private static function _getAppInfo ($appkey = '') 
 	{
 		$MongoDB = new Ap_DB_MongoDB ();
 		$appInfo = $MongoDB->getCollection('auth_keys')->findOne(array('appkey' => $appkey));

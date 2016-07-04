@@ -1,9 +1,9 @@
 <?php 
 
-class Ap_Authorize_Oauth 
+class Authorize_Secret 
 {
     // 检验请求合法性 @todo finish this
-    public function verifyRequest () 
+    public static function verifyRequest () 
     {
         // 
     }

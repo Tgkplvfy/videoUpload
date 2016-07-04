@@ -52,8 +52,13 @@ class Ap_Base_Control extends Yaf_Controller_Abstract
 			$request->setActionName($controller . $method);
 		}
 
-		if ($controller != 'demo')
-			$this->verifyRequest();
+		# 检验请求是否合法
+		if ($controller != 'demo') 
+		{
+			$result = $this->verifyRequest();
+			if ($result !== TRUE) 
+				$this->response(NULL, 401, 'invalid token!');
+		}
 	}
 
 	# 接口返回数据 JSON 格式
@@ -76,57 +81,18 @@ class Ap_Base_Control extends Yaf_Controller_Abstract
 	# 检验请求是否合法 deprecated for now
 	public function verifyRequest () 
 	{
-		# 校验请求 token
-		if ( ! isset($_REQUEST['token']) OR strpos($_REQUEST['token'], ':') === FALSE) {
-			$this->response(NULL, 400, 'Invalid token !');
+		$verifyType  = 'secret';
+		$verifyClass = 'Authorize_' . ucfirst($verifyType);
+
+		$verifyResult = FALSE;
+
+		try {
+			$verifyResult = $verifyClass::verifyRequest();
+		} catch (Exception $e) {
+			// Ap_Log::Log('');
 		}
 
-		list($appkey, $signature) = explode(':', trim($_REQUEST['token']));
-		$appInfo = $this->_getAppInfo($appkey);
-
-		$verifyType = 'secret';
-		switch ($verifyType) 
-		{
-			case 'none':
-				return TRUE;
-				break;
-
-			case 'secret':
-				break;
-				
-			case 'signature':
-				break;
-				
-			case 'oauth':
-				break;
-				
-			default:
-				break;
-		}
-		if ( ! $appInfo OR $signature != $appInfo['secret']) {
-			$this->response(NULL, 401, 'Invalid token !');
-		}
-
-		return TRUE;
-	}
-
-	# 获取当前请求的APP信息
-	private function _getAppInfo ($appkey = '') 
-	{
-		$MongoDB = new Ap_DB_MongoDB ();
-		$appInfo = $MongoDB->getCollection('auth_keys')->findOne(array('appkey' => $appkey));
-
-		# 添加测试appkey和secret
-		if ( ! $MongoDB->getCollection('auth_keys')->findOne(array('appkey' => 'imooc'))) 
-		{
-			$MongoDB->getCollection('auth_keys')->save(array(
-				'_id' => new MongoId(), 
-				'uid' => 1, 
-				'appkey' => 'imooc', 
-				'secret' => 'upload'
-			));
-		}
-		return $appInfo ? $appInfo : FALSE;
+		return $verifyResult;
 	}
 
 }

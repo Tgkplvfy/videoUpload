@@ -1,9 +1,9 @@
 <?php 
 
-class Ap_Authorize_Signature 
+class Authorize_Secret 
 {
     // 校验请求是否合法
-    public function verifyRequest () 
+    public static function verifyRequest () 
     {
 		# 校验请求 token
 		if ( ! isset($_REQUEST['token']) OR strpos($_REQUEST['token'], ':') === FALSE) 
