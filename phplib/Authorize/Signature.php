@@ -7,7 +7,7 @@ class Authorize_Secret
     {
 		# 校验请求 token
 		if ( ! isset($_REQUEST['token']) OR strpos($_REQUEST['token'], ':') === FALSE) 
-			return FASLE;
+			return FALSE;
 
 		list($appkey, $signature) = explode(':', trim($_REQUEST['token']));
 		$secret = $this->_getAppSecret($appkey);
@@ -32,7 +32,10 @@ class Authorize_Secret
     {
         unset($params['signature']);
 
-        $params = array_filter($params, 'strlen');
+        $params = array_filter($input, function($val){
+            if (is_string($val)) return strlen($val);
+            return true;
+        });
 
         ksort($params);
         $signature = hash_hmac('sha1', http_build_query($params), $secret);
