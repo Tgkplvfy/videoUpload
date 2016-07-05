@@ -34,6 +34,7 @@ class Authorize_Signature
     {
         // unset($params['signature']);
         unset($params['token']);
+        unset($params['_']);
         $params = array_filter($params, function($val){
             if (is_string($val)) return strlen($val);
             return true;
