@@ -46,8 +46,10 @@ class Ap_Base_Control extends Yaf_Controller_Abstract
 		# 检验请求是否合法
 		if ($controller != 'demo') 
 		{
-			if ($this->verifyRequest() !== TRUE) 
+			$res = $this->verifyRequest();
+			if ($res !== TRUE) 
 				$this->response(NULL, 401, 'invalid token!');
+				// $this->response(NULL, 401, $res);
 		}
 	}
 
@@ -71,7 +73,7 @@ class Ap_Base_Control extends Yaf_Controller_Abstract
 	# 检验请求是否合法 deprecated for now
 	public function verifyRequest () 
 	{
-		$verifyType  = 'secret';
+		$verifyType  = 'signature';
 		$verifyClass = 'Authorize_' . ucfirst($verifyType);
 
 		$verifyResult = FALSE;

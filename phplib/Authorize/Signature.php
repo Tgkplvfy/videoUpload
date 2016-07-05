@@ -1,6 +1,6 @@
 <?php 
 
-class Authorize_Secret 
+class Authorize_Signature 
 {
     // 校验请求是否合法
     public static function verifyRequest () 
@@ -10,16 +10,18 @@ class Authorize_Secret
 			return FALSE;
 
 		list($appkey, $signature) = explode(':', trim($_REQUEST['token']));
-		$secret = $this->_getAppSecret($appkey);
+		$secret = self::getAppSecret($appkey);
+		if ( ! $secret) 
+			return FALSE;
 
-		if ( ! $appInfo OR $signature !== self::getSignature($secret)) 
+		if ($signature !== self::getSignature($secret, $_REQUEST)) 
 			return FALSE;
 
 		return TRUE;
     }
 
 	# 获取当前请求的APP信息
-	private function _getAppSecret ($appkey = '') 
+	private static function getAppSecret ($appkey = '') 
 	{
 		$MongoDB = new Ap_DB_MongoDB ();
 		$appInfo = $MongoDB->getCollection('auth_keys')->findOne(array('appkey' => $appkey));
@@ -28,24 +30,24 @@ class Authorize_Secret
 	}
 
     # 获取签名字符串
-    public function getSignature ($secret, $params) 
+    public static function getSignature ($secret, $params) 
     {
-        unset($params['signature']);
-
-        $params = array_filter($input, function($val){
+        // unset($params['signature']);
+        unset($params['token']);
+        $params = array_filter($params, function($val){
             if (is_string($val)) return strlen($val);
             return true;
         });
 
         ksort($params);
         $signature = hash_hmac('sha1', http_build_query($params), $secret);
-        $url_sign  = $this->urlsafe_Base64Encode($signature);
+        $url_sign  = self::urlsafe_Base64Encode($signature);
 
         return $url_sign;
     }
 
     // URL 安全的base64加密
-    private function urlsafe_Base64Encode ($string) 
+    private static function urlsafe_Base64Encode ($string) 
     {
         $find = array('+', '/');
         $repl = array('-', '_');
