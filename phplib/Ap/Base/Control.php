@@ -8,12 +8,6 @@
  * ------------------------------------------------
  */
 
-// use League\OAuth2\Server\AuthorizationServer;
-// use League\OAuth2\Server\ResourceServer;
-// use OAuth2\Server\Repositories\AccessTokenRepository;
-// use OAuth2\Server\Repositories\ClientRepository;
-// use OAuth2\Server\Repositories\ScopeRepository;
-
 class Ap_Base_Control extends Yaf_Controller_Abstract
 {
 	public $actions = array();
@@ -52,8 +46,7 @@ class Ap_Base_Control extends Yaf_Controller_Abstract
 		# 检验请求是否合法
 		if ($controller != 'demo') 
 		{
-			$result = $this->verifyRequest();
-			if ($result !== TRUE) 
+			if ($this->verifyRequest() !== TRUE) 
 				$this->response(NULL, 401, 'invalid token!');
 		}
 	}

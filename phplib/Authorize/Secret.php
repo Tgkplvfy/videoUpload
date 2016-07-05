@@ -7,7 +7,7 @@ class Authorize_Secret
     {
 		# 校验请求 token
 		if ( ! isset($_REQUEST['token']) OR strpos($_REQUEST['token'], ':') === FALSE) 
-			return FASLE;
+			return FALSE;
 
 		list($appkey, $secret) = explode(':', trim($_REQUEST['token']));
 		$appInfo = self::_getAppInfo($appkey);
