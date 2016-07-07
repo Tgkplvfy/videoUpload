@@ -46,7 +46,8 @@ class VideoPutAction extends Ap_Base_Action
         $files = $this->saveToMongoDB($savedFiles, $post['title'], $bucketid, $transcode);
 
         // 04. 加入转码队列
-        $this->sendToQueue($files);
+        $priority = isset($post['priority']) ? $post['priority'] : Ap_Service_Gearman::PRIORITY_LOW;
+        $this->sendToQueue($files, $priority);
 
         // 05. 返回信息
         $fileList = array ();
@@ -96,7 +97,7 @@ class VideoPutAction extends Ap_Base_Action
                         'src_id'   => $mongoFile['_id'], 
                         'filename' => $file['filename'], 
                         # 文件基本信息
-                        'title'     => $title, 
+                        // 'title'     => $title, 
                         'size'      => 0, 
                         'mime_type' => $trans['mime_type'], 
                         'md5_file'  => '', 
@@ -110,13 +111,13 @@ class VideoPutAction extends Ap_Base_Action
                         "width"              => $trans['width'], 
                         "height"             => $trans['height'], 
                         "encrypt"            => $trans['encrypt'], 
-                        "status"             => $file['status'], 
-                        "convert_begin_time" => '', 
-                        "convert_end_time"   => '', 
-                        "proc_id"            => '', 
-                        "secret_key"         => '', 
-                        "fragment_duration"  => '', 
-                        "fragments"          => '' 
+                        "status"             => $file['status'] 
+                        // "convert_begin_time" => '', 
+                        // "convert_end_time"   => '', 
+                        // "proc_id"            => '', 
+                        // "secret_key"         => '', 
+                        // "fragment_duration"  => '', 
+                        // "fragments"          => '' 
                     );
                     $videoTbl->save($transFile);
                 }
@@ -181,7 +182,7 @@ class VideoPutAction extends Ap_Base_Action
     }
 
     # 加入转码队列
-    private function sendToQueue ($files) 
+    private function sendToQueue ($files, $priority = Ap_Service_Gearman::PRIORITY_LOW) 
     {
         if (empty($files)) return TRUE;
 

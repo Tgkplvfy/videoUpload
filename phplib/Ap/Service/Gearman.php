@@ -9,18 +9,22 @@
  */
 class Ap_Service_Gearman {
 
+    const PRIORITY_HIGH   = 'high';
+    const PRIORITY_NORMAL = 'normal';
+    const PRIORITY_LOW    = 'low';
+
+    public static $gearmanFuncs = array (
+    	self::PRIORITY_HIGH   => 'doHighBackground', 
+    	self::PRIORITY_NORMAL => 'doBackground', 
+    	self::PRIORITY_LOW    => 'doLowBackground' 
+    );
+
     public function __construct ($host = '', $port = '') 
     {
-        // try {
-        //     $this->_client = new GearmanClient();
-    	// 	$this->_client->addServers($host, $port);
-        // } catch (Exception $e) {
-        //     // Ap_Log::log($e->getMessage());
-        // }
     }
 
     # 添加视频转码任务
-    public static function createVideoJobs ($file) 
+    public static function createVideoJobs ($file, $priority = self::PRIORITY_LOW) 
     {
         $gmclient = new GearmanClient();
         $config   = new Yaf_Config_Ini(ROOT_PATH . '/conf/gearman.ini', 'product');
@@ -51,18 +55,21 @@ class Ap_Service_Gearman {
             $uniqKey  = (string) $job['_id'];
             $workload = json_encode(array('_id' => $uniqKey, 'fragment' => $fragment));
 
+            if ( ! array_key_exists($priority, self::$gearmanFuncs)) $priority = 'low';
+            $func = self::$gearmanFuncs[$priority];
+
             try {
-                $result  = $gmclient->doBackground(Ap_Vars::GEARMAN_FUN_DEFAULT, $workload, $uniqKey);
+                $result  = $gmclient->$func(Ap_Vars::GEARMAN_FUN_DEFAULT, $workload, $uniqKey);
+                Ap_Log::log($gmclient->getErrno() . ':' . $gmclient->error());
                 if (!$result) {
                     sleep(1);
-                    $result = $gmclient->doBackground(Ap_Vars::GEARMAN_FUN_DEFAULT, $workload, $uniqKey);
+                    $result = $gmclient->$func(Ap_Vars::GEARMAN_FUN_DEFAULT, $workload, $uniqKey);
                     if(!$result){
-                        $errno = $gmclient->getErrno();
-                        // Ap_Log::log($errno . ':' . $gmclient->error());
+                        Ap_Log::log($gmclient->getErrno() . ':' . $gmclient->error());
                     }
                 }
             } catch (Exception $e) {
-                // Ap_Log::log($e->getMessage());
+                Ap_Log::log($e->getMessage());
             }
         }
     }

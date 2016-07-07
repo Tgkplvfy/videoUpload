@@ -111,11 +111,9 @@ class Ap_Log {
     public static function log($info, $collection = 'log') {
         try {
             if (empty(self::$conf)) {
-                self::$conf = new Yaf_Config_Ini(APP_PATH.'/conf/mongodb.ini');
+                self::$conf = new Yaf_Config_Ini(ROOT_PATH.'/conf/mongodb.ini');
             }
             $conf = self::$conf->get('log');
-            //$mon = new MongoClient("mongodb://" . $conf->host, $conf->option->toArray());
-            //$coll = $mon->selectCollection($conf->db, 'log');
             
             if (!is_array($info)) {
                 $info = array('info' => $info);
@@ -127,17 +125,10 @@ class Ap_Log {
             $info['ip'] = Ap_Util_IP::get ();
             $info['url'] = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
             $info['param'] = http_build_query($_POST);
-            if (Yaf_Application::app()) {
-                $dis = Yaf_Application::app()->getDispatcher()->getRequest();
-                $info['module'] = constant('MODULE');
-                $info['action'] = $dis->action;
-                $info['uid'] = Ap_Service_Data_Loginuser::uId();
-            }
-            //$coll->save($info);
             
             //同时保存一份到文件中
             $date = date ( "Ymd" );
-            $filename = Ap_Constants::LOG_SAVE_PATH . $collection . "_" . $date . ".log";
+            $filename = ROOT_PATH . '/logs/' . $collection . "_" . $date . ".log";
             if (!file_exists($filename)) {
                 error_log ( 'new debug started', 3, $filename );
                 chmod($filename, 0777);
@@ -151,7 +142,7 @@ class Ap_Log {
             return true;
         } catch (Exception $ex) {
             $date = date ( "Ymd" );
-            $filename = Ap_Constants::LOG_SAVE_PATH . "log_" . $date . ".log";
+            $filename = ROOT_PATH . '/logs/' . "log_" . $date . ".log";
             if (!file_exists($filename)) {
                 error_log ( 'new debug started', 3, $filename );
                 chmod($filename, 0777);

@@ -25,6 +25,9 @@ class Ap_Vars {
     const FILESTATUS_TRANSED  = 5;   # 转码成功
     const FILESTATUS_FINISHED = 6;   # 转码成功并保存成功
 
+
+    const LOG_SAVE_PATH = '/logs';   # 日志保存目录
+
     # 默认转码类型 type 代表类型编码，用于标示
     public static $transSettings = array(
         array('type'=>'0', 'mime_type'=>'video/mp4',    'fps'=>15, 'audio_bps'=>'64K', 'video_bps'=>'256K', 'width'=>'720',  'height'=>'480', 'encrypt'=>0), 
