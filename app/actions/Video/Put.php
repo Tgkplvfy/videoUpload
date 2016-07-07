@@ -82,14 +82,25 @@ class VideoPutAction extends Ap_Base_Action
         
         foreach ($savedFiles as $file) 
         {
-            $mongoFile = isset($file['saved']) ? $file['mongo'] : $this->__saveMainFile($file);
+            $mongoFile = isset($file['saved']) && $file['saved'] === TRUE ? $file['mongo'] : $this->__saveMainFile($file);
             $this->__saveBucketVideo($bucketid, $title, '', $mongoFile['_id']); # 保存上传记录
 
             if (isset($file['pic']) && file_exists($file['pic'])) unlink($file['pic']); # 删除临时缩略图文件
 
+            if ( ! isset($file['filename'])) continue; # 文件保存MongoDB失败
+
             # 存储需要转码的文件信息
             foreach ($transcode as $trans) {
-                $transFile = $videoTbl->findOne(array('transType' => $trans['type'], 'src_id' => $mongoFile['_id']));
+                $transFile = $videoTbl->findOne(array(
+                    'mime_type' => $trans['mime_type'], 
+                    'fps'       => $trans['fps'], 
+                    'audio_bps' => $trans['audio_bps'], 
+                    'video_bps' => $trans['video_bps'], 
+                    'width'     => $trans['width'], 
+                    'height'    => $trans['height'], 
+                    // 'encrypt'   => $trans['encrypt'], 
+                    'src_id'    => $mongoFile['_id']
+                )); # 是否已经存在相同的转码文件
                 if ( ! $transFile) {
                     $transFile = array(
                         # 原始文件信息
@@ -97,14 +108,12 @@ class VideoPutAction extends Ap_Base_Action
                         'src_id'   => $mongoFile['_id'], 
                         'filename' => $file['filename'], 
                         # 文件基本信息
-                        // 'title'     => $title, 
-                        'size'      => 0, 
+                        // 'size'      => 0, 
                         'mime_type' => $trans['mime_type'], 
-                        'md5_file'  => '', 
+                        // 'md5_file'  => '', 
                         'pic'       => $mongoFile['pic'], 
                         'duration'  => $file['duration'], 
                         # 文件转码信息
-                        "transType"          => $trans['type'], 
                         "fps"                => $trans['fps'], 
                         "audio_bps"          => $trans['audio_bps'], 
                         "video_bps"          => $trans['video_bps'], 
@@ -112,12 +121,6 @@ class VideoPutAction extends Ap_Base_Action
                         "height"             => $trans['height'], 
                         "encrypt"            => $trans['encrypt'], 
                         "status"             => $file['status'] 
-                        // "convert_begin_time" => '', 
-                        // "convert_end_time"   => '', 
-                        // "proc_id"            => '', 
-                        // "secret_key"         => '', 
-                        // "fragment_duration"  => '', 
-                        // "fragments"          => '' 
                     );
                     $videoTbl->save($transFile);
                 }
@@ -141,7 +144,6 @@ class VideoPutAction extends Ap_Base_Action
         $videoThumb = $imgAdapter->getURL($picHashKey, '720', '480');
         $mongoData  = array(
             '_id'       => new MongoId(), 
-            // 'bucket_id' => 'www', 
             'filename'  => $file['filename'], 
             'size'      => $file['size'], 
             'mime_type' => $file['mime_type'], 
@@ -150,13 +152,16 @@ class VideoPutAction extends Ap_Base_Action
             'watermark' => '', 
             'status'    => $file['status'], 
             'duration'  => $file['duration'] 
-            // 'fragment'  => $transcode 
         );
 
         $apMongo  = new Ap_DB_MongoDB ();
-        $apMongo->getCollection(Ap_Vars::MONGO_TBL_VIDEO)->save($mongoData);
+        $res = $apMongo->getCollection(Ap_Vars::MONGO_TBL_VIDEO)->save($mongoData);
+        if ( ! $res) {
+            Ap_Log::log('MongoDB insert fails:' . $file['filename']);
+            $res = $apMongo->getCollection(Ap_Vars::MONGO_TBL_VIDEO)->save($mongoData);
+        }
         
-        return $mongoData;
+        return $res ? $mongoData : FALSE;
     }
 
     # 保存视频文件
