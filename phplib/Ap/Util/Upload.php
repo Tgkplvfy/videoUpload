@@ -120,8 +120,8 @@ class Ap_Util_Upload
 				$duplicate = $this->__fileDuplicate(md5_file($tmpname));
 				if ($duplicate !== FALSE) {
 					$this->save_info[] = array(
-						"mongo"     => $duplicate, 
-						"saved"     => TRUE 
+						"mongo" => $duplicate, 
+						"saved" => TRUE 
 					);
 					continue;
 				}

@@ -73,7 +73,7 @@ class Ap_Base_Control extends Yaf_Controller_Abstract
 	# 检验请求是否合法 deprecated for now
 	public function verifyRequest () 
 	{
-		$verifyType  = 'signature';
+		$verifyType  = 'none';
 		$verifyClass = 'Authorize_' . ucfirst($verifyType);
 
 		$verifyResult = FALSE;

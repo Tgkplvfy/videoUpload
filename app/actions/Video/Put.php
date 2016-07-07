@@ -9,6 +9,8 @@ class VideoPutAction extends Ap_Base_Action
     const MONGO_TBL_VIDEO       = 'video';
     const MONGO_TBL_BUCKETVIDEO = 'bucketvideo';
 
+    private $upload_id;
+
     public function execute () 
     {
         $post = $this->getRequest()->getPost();
@@ -42,6 +44,7 @@ class VideoPutAction extends Ap_Base_Action
         }
 
         // 03. 转储文件信息到 MongoDB
+        $this->upload_id = new MongoId();
         $savedFiles  = $Uploader->getSaveInfo();
         $files = $this->saveToMongoDB($savedFiles, $post['title'], $bucketid, $transcode);
 
@@ -77,17 +80,15 @@ class VideoPutAction extends Ap_Base_Action
     {
         $apMongo  = new Ap_DB_MongoDB ();
         $videoTbl = $apMongo->getCollection(Ap_Vars::MONGO_TBL_VIDEO);
-
         $files    = array();
         
         foreach ($savedFiles as $file) 
         {
-            $mongoFile = isset($file['saved']) && $file['saved'] === TRUE ? $file['mongo'] : $this->__saveMainFile($file);
+            $mongoFile = isset($file['saved']) ? $file['mongo'] : $this->__saveMainFile($file);
             $this->__saveBucketVideo($bucketid, $title, '', $mongoFile['_id']); # 保存上传记录
 
             if (isset($file['pic']) && file_exists($file['pic'])) unlink($file['pic']); # 删除临时缩略图文件
-
-            if ( ! isset($file['filename'])) continue; # 文件保存MongoDB失败
+            if ( ! isset($mongoFile['filename'])) continue; # 文件保存MongoDB失败
 
             # 存储需要转码的文件信息
             foreach ($transcode as $trans) {
@@ -106,13 +107,13 @@ class VideoPutAction extends Ap_Base_Action
                         # 原始文件信息
                         '_id'      => new MongoId(), 
                         'src_id'   => $mongoFile['_id'], 
-                        'filename' => $file['filename'], 
+                        'filename' => $mongoFile['filename'], 
                         # 文件基本信息
                         // 'size'      => 0, 
                         'mime_type' => $trans['mime_type'], 
                         // 'md5_file'  => '', 
                         'pic'       => $mongoFile['pic'], 
-                        'duration'  => $file['duration'], 
+                        'duration'  => $mongoFile['duration'], 
                         # 文件转码信息
                         "fps"                => $trans['fps'], 
                         "audio_bps"          => $trans['audio_bps'], 
@@ -120,7 +121,7 @@ class VideoPutAction extends Ap_Base_Action
                         "width"              => $trans['width'], 
                         "height"             => $trans['height'], 
                         "encrypt"            => $trans['encrypt'], 
-                        "status"             => $file['status'] 
+                        "status"             => $mongoFile['status'] 
                     );
                     $videoTbl->save($transFile);
                 }
@@ -168,22 +169,24 @@ class VideoPutAction extends Ap_Base_Action
     private function __saveBucketVideo ($bucketid, $title, $src_video_id, $dst_video_id) 
     {
         $apMongo = new Ap_DB_MongoDB();
-        $where = array(
-            'bucket_id'    => $bucketid, 
-            'title'        => $title, 
-            'dst_video_id' => $dst_video_id
-        );
+        // $where = array(
+        //     'bucket_id'    => $bucketid, 
+        //     'title'        => $title, 
+        //     'upload_id'    => $this->upload_id, 
+        //     'dst_video_id' => $dst_video_id
+        // );
 
         $tblBVideo = $apMongo->getCollection(Ap_Vars::MONGO_TBL_BUCKETVIDEO);
-        if ( ! $tblBVideo->findOne($where)) {
+        // if ( ! $tblBVideo->findOne($where)) {
             return $tblBVideo->save(array(
                 '_id'          => new MongoId(), 
                 'bucket_id'    => $bucketid, 
+                'upload_id'    => $this->upload_id, 
                 'title'        => $title, 
                 'src_video_id' => $src_video_id, 
                 'dst_video_id' => $dst_video_id 
             ));
-        }
+        // }
     }
 
     # 加入转码队列

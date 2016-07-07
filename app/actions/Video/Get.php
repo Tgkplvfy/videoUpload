@@ -40,7 +40,11 @@ class VideoGetAction extends Ap_Base_Action
 
             $info['title']    = $item['title'];        # 增加字符串类型ID便于前段读取
             $info['stringid'] = (string) $item['_id']; # 增加字符串类型ID便于前段读取
-            $info['subfiles'] = $m_video->getMany(array('src_id'=>$v_id));
+            $subfiles = $m_bucketvideo->getMany(array('src_video_id' => $v_id, 'upload_id' => $item['upload_id']));
+            $subids   = array();
+            // print_r($subfiles);
+            foreach ($subfiles as $file) $subids[] = $file['dst_video_id'];
+            $info['subfiles'] = $m_video->getMany(array('_id'=>array('$in'=>$subids))); # 获取当次上传的转码文件
             $vlist[] = $info;
         }
 
