@@ -73,7 +73,9 @@ class Ap_Base_Control extends Yaf_Controller_Abstract
 	# 检验请求是否合法 deprecated for now
 	public function verifyRequest () 
 	{
-		$verifyType  = 'none';
+        // $config      = new Yaf_Config_Ini(ROOT_PATH . '/conf/app.ini', 'product');
+        // $verifyType  = $config->application->get('apiauth');
+        $verifyType  = 'none';
 		$verifyClass = 'Authorize_' . ucfirst($verifyType);
 
 		$verifyResult = FALSE;
