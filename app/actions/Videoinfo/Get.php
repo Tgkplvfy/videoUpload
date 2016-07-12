@@ -4,8 +4,6 @@
  * 获取视频列表
  */
 
-// use MongoDB\BSON\Regex;
-
 class VideoinfoGetAction extends Ap_Base_Action 
 {
 
@@ -20,6 +18,9 @@ class VideoinfoGetAction extends Ap_Base_Action
 
         $videoid = new MongoId($vid);
 
+        if ( ! isset($token[0])) 
+            $this->response(NULL, 401, '无法验证token!');
+            
         $where = array('bucket_id' => $token[0], 'dst_video_id'=>$videoid);
         
         $video = $m_bucketvideo->getOne($where);

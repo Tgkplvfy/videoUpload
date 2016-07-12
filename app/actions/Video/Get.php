@@ -21,6 +21,9 @@ class VideoGetAction extends Ap_Base_Action
         $m_video       = new Ap_Model_Video();
         $m_bucketvideo = new Ap_Model_BucketVideo();
 
+        if ( ! isset($token[0])) 
+            $this->response(NULL, 401, '无法验证token!');
+
         $where = array('bucket_id' => $token[0], 'src_video_id'=>'');
         if ($search) $where['title'] = new MongoRegex("/{$search}/");
         if ($ids) $where['dst_video_id'] = array('$in' => $ids);
