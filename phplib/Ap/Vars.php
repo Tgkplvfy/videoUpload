@@ -28,6 +28,9 @@ class Ap_Vars {
 
     const LOG_SAVE_PATH = '/logs';   # 日志保存目录
 
+    # 默认水印图片路径
+    const DEFAULT_WATERMARK = '/storage/water.png';
+
     # 默认转码类型 type 代表类型编码，用于标示
     public static $transSettings = array(
         array('mime_type'=>'video/mp4',    'fps'=>15, 'audio_bps'=>'64K', 'video_bps'=>'256K', 'width'=>'720',  'height'=>'480', 'encrypt'=>0), 

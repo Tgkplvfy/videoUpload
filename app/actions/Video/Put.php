@@ -17,8 +17,17 @@ class VideoPutAction extends Ap_Base_Action
         $file = $this->getRequest()->getFiles();
 
         // 01. 获取并检验参数 TODO
-        if ( ! isset($file['files'])) {
+        if ( ! isset($file['files'])) 
             $this->response(NULL, 400, 'no files uploaded');
+        # 01.1. 获取水印信息
+        $watermark = isset($post['watermark']) ? $post['watermark'] : '';
+        if (in_array($watermark, array('default', 'custom'))) {
+            if ($watermark == 'default') 
+                $watermark = Ap_Util_Watermark::getDefaultWaterMark();
+            else if (isset($file['watermark_file']))
+                $watermark = Ap_Util_Watermark::getWaterMarkFile($file['watermark_file']);
+            else 
+                $this->response(NULL, 400, 'please select a watermark file!');
         }
 
         # 获取bucket_id
@@ -26,8 +35,9 @@ class VideoPutAction extends Ap_Base_Action
         $bucketid = $tokenarr[0];
 
         # 校验上传后的转码设置，最多设置6个转码参数
-        $parameter = array_slice($post['parameter'], 0, 6, TRUE);
         $transcode = array();
+        if ( ! isset($post['parameter']) OR ! is_array($post['parameter'])) $this->response(NULL, 400, 'params incomplete!');
+        $parameter = array_slice($post['parameter'], 0, 6, TRUE);
         foreach ($parameter as $key => $val) {
             isset(Ap_Vars::$transSettings[$key]) && $transcode[] = Ap_Vars::$transSettings[$key];
         }
@@ -46,11 +56,11 @@ class VideoPutAction extends Ap_Base_Action
         // 03. 转储文件信息到 MongoDB
         $this->upload_id = new MongoId();
         $savedFiles  = $Uploader->getSaveInfo();
-        $files = $this->saveToMongoDB($savedFiles, $post['title'], $bucketid, $transcode);
+        $files = $this->saveToMongoDB($savedFiles, $post['title'], $bucketid, $transcode, $watermark);
 
         // 04. 加入转码队列
         $priority = isset($post['priority']) ? $post['priority'] : Ap_Service_Gearman::PRIORITY_LOW;
-        $this->sendToQueue($files, $priority);
+        $this->sendToQueue($files, $priority, $watermark);
 
         // 05. 返回信息
         $fileList = array ();
@@ -63,20 +73,8 @@ class VideoPutAction extends Ap_Base_Action
         $this->response($fileList);
     }
 
-    # 校验请求参数
-    private function verifyParams () 
-    {
-        // 
-    }
-
-    # 保存上传文件
-    private function saveFiles ($files) 
-    {
-        // 
-    }
-
     # 转储MongoDB
-    private function saveToMongoDB ($savedFiles, $title = '', $bucketid, $transcode) 
+    private function saveToMongoDB ($savedFiles, $title = '', $bucketid, $transcode, $watermark = '') 
     {
         $apMongo  = new Ap_DB_MongoDB ();
         $videoTbl = $apMongo->getCollection(Ap_Vars::MONGO_TBL_VIDEO);
@@ -84,7 +82,7 @@ class VideoPutAction extends Ap_Base_Action
         
         foreach ($savedFiles as $file) 
         {
-            $mongoFile = isset($file['saved']) ? $file['mongo'] : $this->__saveMainFile($file);
+            $mongoFile = isset($file['saved']) ? $file['mongo'] : $this->__saveMainFile($file, $watermark);
             $this->__saveBucketVideo($bucketid, $title, '', $mongoFile['_id']); # 保存上传记录
 
             if (isset($file['pic']) && file_exists($file['pic'])) unlink($file['pic']); # 删除临时缩略图文件
@@ -137,7 +135,7 @@ class VideoPutAction extends Ap_Base_Action
     }
 
     # 保存主文件
-    private function __saveMainFile ($file) 
+    private function __saveMainFile ($file, $watermark) 
     {
         # 缩略图文件转储到MongoDB并更新字段值
         $imgAdapter = new Ap_ImageAdapter ();
@@ -150,7 +148,7 @@ class VideoPutAction extends Ap_Base_Action
             'mime_type' => $file['mime_type'], 
             'md5_file'  => $file['md5'], 
             'pic'       => $videoThumb, 
-            'watermark' => '', 
+            'watermark' => $watermark, 
             'status'    => $file['status'], 
             'duration'  => $file['duration'] 
         );
@@ -190,13 +188,13 @@ class VideoPutAction extends Ap_Base_Action
     }
 
     # 加入转码队列
-    private function sendToQueue ($files, $priority = Ap_Service_Gearman::PRIORITY_LOW) 
+    private function sendToQueue ($files, $priority = Ap_Service_Gearman::PRIORITY_LOW, $watermark = '') 
     {
         if (empty($files)) return TRUE;
 
         # 每个文件执行所有转码任务
         foreach ($files as $file) {
-            $job = Ap_Service_Gearman::createVideoJobs($file);
+            $job = Ap_Service_Gearman::createVideoJobs($file, $priority, $watermark);
             if ( ! $job) continue;
         }
 

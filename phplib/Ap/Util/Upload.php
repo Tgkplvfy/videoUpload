@@ -250,7 +250,7 @@ class Ap_Util_Upload
 	private function __fileDuplicate ($md5) 
 	{
 		$apMongo   = new Ap_DB_MongoDB();
-		$duplicate = $apMongo->getCollection('video')->findOne(array('md5_file' => $md5));
+		$duplicate = $apMongo->getCollection('video')->findOne(array('md5_file' => $md5, 'status'=>Ap_Vars::FILESTATUS_SAVED));
 
 		return $duplicate ? $duplicate : FALSE;
 	}

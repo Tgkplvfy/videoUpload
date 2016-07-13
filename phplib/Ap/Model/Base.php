@@ -16,6 +16,11 @@ class Ap_Model_Base
         $this->Collection  = $this->mongoClient->getCollection($this->table);
     }
 
+    public function insert ($data) 
+    {
+        $this->Collection->save($data);
+    }
+
     public function getOne ($where) 
     {
         return $this->Collection->findOne($where);

@@ -9,7 +9,8 @@ class TestGetAction extends Ap_Base_Action
         1 => 'testMongo', 
         2 => 'testGearman', 
         3 => 'testToken', 
-        4 => 'testPhp'
+        4 => 'testPhp', 
+        4 => 'testFastDFS'
     );
 
     public function execute () 
@@ -80,6 +81,27 @@ class TestGetAction extends Ap_Base_Action
     public function testPhp () 
     {
         phpinfo();
+    }
+
+    public function testFastDFS () 
+    {
+        $path = ROOT_PATH . '/logs/videoUploadApi.log';
+
+        $file    = fastdfs_storage_upload_by_filename(ROOT_PATH . '/logs/videoUploadApi.log');
+        $errno   = fastdfs_get_last_error_no();
+        $errinfo = fastdfs_get_last_error_info();
+
+        echo nl2br(file_get_contents($path));
+        var_dump($file);
+        var_dump($errno);
+        var_dump($errinfo);
+
+        // $fastdfs = new FastDFS();
+
+        // var_dump($fastdfs->tracker_make_all_connections());
+        // var_dump($fastdfs->get_last_error_no());
+        // var_dump($fastdfs->get_last_error_info());
+        // echo 'testing fastDFS...';
     }
 
 }
