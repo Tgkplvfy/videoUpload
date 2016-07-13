@@ -24,7 +24,7 @@ class Ap_Service_Gearman {
     }
 
     # 添加视频转码任务
-    public static function createVideoJobs ($file, $priority = self::PRIORITY_LOW, $watermark) 
+    public static function createVideoJobs ($file, $priority = self::PRIORITY_LOW, $watermark = '') 
     {
         $gmclient = new GearmanClient();
         $config   = new Yaf_Config_Ini(ROOT_PATH . '/conf/gearman.ini', 'product');
@@ -50,7 +50,7 @@ class Ap_Service_Gearman {
                 'width'     => $job['width'], 
                 'height'    => $job['height'], 
                 'encrypt'   => $job['encrypt'], 
-                'watermark' => $watermark 
+                'watermark' => (string) $watermark 
             );
 
             $uniqKey  = (string) $job['_id'];

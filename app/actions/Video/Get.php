@@ -41,8 +41,9 @@ class VideoGetAction extends Ap_Base_Action
             $info = $m_video->getOneById($v_id);
             if ( ! $info) continue;
 
-            $info['title']    = $item['title'];        # 增加字符串类型ID便于前段读取
-            $info['stringid'] = (string) $info['_id']; # 增加字符串类型ID便于前段读取
+            $info['title']     = $item['title'];        # 增加字符串类型ID便于前段读取
+            $info['stringid']  = (string) $info['_id']; # 增加字符串类型ID便于前段读取
+            $info['watermark'] = isset($item['watermark']) ? (string) $item['watermark'] : ''; # 增加字符串类型ID便于前段读取
             $subfiles = $m_bucketvideo->getMany(array('src_video_id' => $v_id, 'upload_id' => $item['upload_id']));
             $subids   = array();
 

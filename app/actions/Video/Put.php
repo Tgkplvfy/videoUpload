@@ -82,8 +82,8 @@ class VideoPutAction extends Ap_Base_Action
         
         foreach ($savedFiles as $file) 
         {
-            $mongoFile = isset($file['saved']) ? $file['mongo'] : $this->__saveMainFile($file, $watermark);
-            $this->__saveBucketVideo($bucketid, $title, '', $mongoFile['_id']); # 保存上传记录
+            $mongoFile = isset($file['saved']) ? $file['mongo'] : $this->__saveMainFile($file);
+            $this->__saveBucketVideo($bucketid, $title, '', $mongoFile['_id'], $watermark); # 保存上传记录
 
             if (isset($file['pic']) && file_exists($file['pic'])) unlink($file['pic']); # 删除临时缩略图文件
             if ( ! isset($mongoFile['filename'])) continue; # 文件保存MongoDB失败
@@ -125,7 +125,7 @@ class VideoPutAction extends Ap_Base_Action
                 }
 
                 # 如果已经保存过转码文件记录，不再记录！
-                $this->__saveBucketVideo($bucketid, $title, $mongoFile['_id'], $transFile['_id']);
+                $this->__saveBucketVideo($bucketid, $title, $mongoFile['_id'], $transFile['_id'], $watermark);
             }
 
             $files[] = $mongoFile;
@@ -148,7 +148,7 @@ class VideoPutAction extends Ap_Base_Action
             'mime_type' => $file['mime_type'], 
             'md5_file'  => $file['md5'], 
             'pic'       => $videoThumb, 
-            'watermark' => $watermark, 
+            // 'watermark' => $watermark, 
             'status'    => $file['status'], 
             'duration'  => $file['duration'] 
         );
@@ -164,7 +164,7 @@ class VideoPutAction extends Ap_Base_Action
     }
 
     # 保存视频文件
-    private function __saveBucketVideo ($bucketid, $title, $src_video_id, $dst_video_id) 
+    private function __saveBucketVideo ($bucketid, $title, $src_video_id, $dst_video_id, $watermark = '') 
     {
         $apMongo = new Ap_DB_MongoDB();
         // $where = array(
@@ -181,6 +181,7 @@ class VideoPutAction extends Ap_Base_Action
                 'bucket_id'    => $bucketid, 
                 'upload_id'    => $this->upload_id, 
                 'title'        => $title, 
+                'watermark'    => $watermark, 
                 'src_video_id' => $src_video_id, 
                 'dst_video_id' => $dst_video_id 
             ));

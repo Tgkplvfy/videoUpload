@@ -28,7 +28,7 @@ class Ap_Util_Watermark
         $m_watermark = new Ap_Model_Watermark();
         $m_watermark->insert($data);
         
-        return (string) $data['_id'];
+        return $data['_id'];
     }
 
     // 获取上传的水印文件
@@ -46,7 +46,7 @@ class Ap_Util_Watermark
             $m_watermark = new Ap_Model_Watermark();
             $m_watermark->insert($data);
             
-            return (string) $data['_id'];
+            return $data['_id'];
         }
     }
 
