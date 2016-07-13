@@ -43,7 +43,7 @@ class VideoGetAction extends Ap_Base_Action
 
             $info['title']     = $item['title'];        # 增加字符串类型ID便于前段读取
             $info['stringid']  = (string) $info['_id']; # 增加字符串类型ID便于前段读取
-            $info['watermark'] = isset($item['watermark']) ? (string) $item['watermark'] : ''; # 增加字符串类型ID便于前段读取
+            $info['watermark'] = isset($item['watermark']) ? $this->getWaterMark($item['watermark']) : ''; # 增加字符串类型ID便于前段读取
             $subfiles = $m_bucketvideo->getMany(array('src_video_id' => $v_id, 'upload_id' => $item['upload_id']));
             $subids   = array();
 
@@ -58,5 +58,14 @@ class VideoGetAction extends Ap_Base_Action
             'pagesize' => $pagesize, 
             'total' => $total
         ));
+    }
+
+    public function getWaterMark ($id = '') 
+    {
+        if (empty($id)) return '';
+        $m_watermark = new Ap_Model_Watermark();
+        $data = $m_watermark->getOneById($id);
+
+        return $data ? $data['content'] : '';
     }
 }
