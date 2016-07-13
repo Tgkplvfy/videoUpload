@@ -48,6 +48,8 @@ Temporary Items
 
 # project ignores
 logs/*
-storage/*
+# used for common storage
+# storage/* 
+storage/fails/*
 conf/*.ini
 .vscode
