@@ -73,8 +73,8 @@ class VideoPutAction extends Ap_Base_Action
         $this->response($fileList);
     }
 
-    # 转储MongoDB
-    private function saveToMongoDB ($savedFiles, $title = '', $bucketid, $transcode, $watermark = '') 
+    # 上传文件信息转储MongoDB
+    private function saveToMongoDB ($savedFiles, $title = '', $bucketid, $transcode, $watermark = array()) 
     {
         $apMongo  = new Ap_DB_MongoDB ();
         $videoTbl = $apMongo->getCollection(Ap_Vars::MONGO_TBL_VIDEO);
@@ -181,7 +181,7 @@ class VideoPutAction extends Ap_Base_Action
                 'bucket_id'    => $bucketid, 
                 'upload_id'    => $this->upload_id, 
                 'title'        => $title, 
-                'watermark'    => $watermark, 
+                'watermark'    => isset($watermark['_id']) ? $watermark['_id'] : '', 
                 'src_video_id' => $src_video_id, 
                 'dst_video_id' => $dst_video_id 
             ));
@@ -189,9 +189,11 @@ class VideoPutAction extends Ap_Base_Action
     }
 
     # 加入转码队列
-    private function sendToQueue ($files, $priority = Ap_Service_Gearman::PRIORITY_LOW, $watermark = '') 
+    private function sendToQueue ($files, $priority = Ap_Service_Gearman::PRIORITY_LOW, $watermark = array()) 
     {
         if (empty($files)) return TRUE;
+
+        $watermark = isset($watermark['content']) ? $watermark['content'] : '';
 
         # 每个文件执行所有转码任务
         foreach ($files as $file) {
