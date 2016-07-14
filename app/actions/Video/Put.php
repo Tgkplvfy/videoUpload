@@ -135,7 +135,7 @@ class VideoPutAction extends Ap_Base_Action
     }
 
     # 保存主文件
-    private function __saveMainFile ($file, $watermark) 
+    private function __saveMainFile ($file) 
     {
         # 缩略图文件转储到MongoDB并更新字段值
         $imgAdapter = new Ap_ImageAdapter ();

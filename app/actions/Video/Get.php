@@ -66,6 +66,6 @@ class VideoGetAction extends Ap_Base_Action
         $m_watermark = new Ap_Model_Watermark();
         $data = $m_watermark->getOneById($id);
 
-        return $data ? $data['content'] : '';
+        return $data ? 'data:image/png;base64,' . $data['content'] : '';
     }
 }
