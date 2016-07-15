@@ -21,11 +21,11 @@ class Ap_File {
 
         $filestr = base64_encode(file_get_contents($path));
         if ($with_prefix !== TRUE)
-            return chunk_split($filestr);
+            return $filestr;
 
         $finfo  = getimagesize($path);
         $prefix = 'data:' . $finfo['mime'] . ';base64,';
-        return chunk_split($prefix . $filestr);
+        return $prefix . $filestr;
     }
     
 }
