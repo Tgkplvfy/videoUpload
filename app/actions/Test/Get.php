@@ -10,7 +10,8 @@ class TestGetAction extends Ap_Base_Action
         2 => 'testGearman', 
         3 => 'testToken', 
         4 => 'testPhp', 
-        4 => 'testFastDFS'
+        5 => 'testFastDFS', 
+        6 => 'testMongoImage', 
     );
 
     public function execute () 
@@ -87,21 +88,24 @@ class TestGetAction extends Ap_Base_Action
     {
         $path = ROOT_PATH . '/logs/videoUploadApi.log';
 
-        $file    = fastdfs_storage_upload_by_filename(ROOT_PATH . '/logs/videoUploadApi.log');
-        $errno   = fastdfs_get_last_error_no();
-        $errinfo = fastdfs_get_last_error_info();
+        // $file    = fastdfs_storage_upload_by_filename(ROOT_PATH . '/logs/videoUploadApi.log');
+        // $errno   = fastdfs_get_last_error_no();
+        // $errinfo = fastdfs_get_last_error_info();
 
-        echo nl2br(file_get_contents($path));
-        var_dump($file);
-        var_dump($errno);
-        var_dump($errinfo);
+        // echo nl2br(file_get_contents($path));
+        // var_dump($file);
+        // var_dump($errno);
+        // var_dump($errinfo);
+    }
 
-        // $fastdfs = new FastDFS();
+    public function testMongoImage () 
+    {
+        $testfile = ROOT_PATH . Ap_Vars::DEFAULT_WATERMARK;
 
-        // var_dump($fastdfs->tracker_make_all_connections());
-        // var_dump($fastdfs->get_last_error_no());
-        // var_dump($fastdfs->get_last_error_info());
-        // echo 'testing fastDFS...';
+        $imgAdapter = new Ap_ImageAdapter ();
+        $picHashKey = $imgAdapter->write($testfile);
+        // $videoThumb = $imgAdapter->getURL($picHashKey);
+        print_r($picHashKey);
     }
 
 }
