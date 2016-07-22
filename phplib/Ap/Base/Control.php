@@ -35,7 +35,7 @@ class Ap_Base_Control extends Yaf_Controller_Abstract
 			$restActions = array ();
 			$methods = array('get', 'post', 'put', 'delete');
 			array_walk($methods, function($item, $key) use ($controller, &$restActions) {
-				$restActions[$controller . $item] = 'actions/' . ucfirst($controller) . '/' . ucfirst($item) . '.php';  # 增加路由
+				$restActions[$controller . $item] = 'actions/' . ucfirst($controller) . '/REST_' . ucfirst($item) . '.php';  # 增加路由
 			});
 
 			# 给当前Controller添加restFUL的action路由, 并设定rest action的名字
@@ -49,7 +49,8 @@ class Ap_Base_Control extends Yaf_Controller_Abstract
 			$res = $this->verifyRequest();
 			if ($res !== TRUE) 
 				$this->response(NULL, 401, 'invalid token!');
-				// $this->response(NULL, 401, $res);
+			else 
+				Yaf_Registry::set('request_token', $this->getTokenInfo()); # 全局注册request_token信息
 		}
 	}
 
@@ -73,9 +74,8 @@ class Ap_Base_Control extends Yaf_Controller_Abstract
 	# 检验请求是否合法 deprecated for now
 	public function verifyRequest () 
 	{
-        // $config      = new Yaf_Config_Ini(ROOT_PATH . '/conf/app.ini', 'product');
-        // $verifyType  = $config->application->get('apiauth');
-        $verifyType  = 'none';
+        $config      = new Yaf_Config_Ini(ROOT_PATH . '/conf/app.ini', 'product');
+        $verifyType  = $config->application->get('apiauth');
 		$verifyClass = 'Authorize_' . ucfirst($verifyType);
 
 		$verifyResult = FALSE;
@@ -87,6 +87,15 @@ class Ap_Base_Control extends Yaf_Controller_Abstract
 		}
 
 		return $verifyResult;
+	}
+
+	# 获取请求API的token信息
+	public function getTokenInfo () 
+	{
+		$token = isset($_REQUEST['token']) ? $_REQUEST['token'] : '';
+
+		$token_info = explode(':', $token);
+		return array( 'appkey' => isset($token_info[0]) ? $token_info[0] : '' );
 	}
 
 }

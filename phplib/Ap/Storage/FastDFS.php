@@ -24,6 +24,11 @@ class Ap_Storage_FastDFS implements Ap_Base_Storage
 	{
 		$result = $this->_fdfs->storage_upload_by_filename1($file, $ext);
 
+		if (empty($result) OR ! $result) {
+			// 记录FastDFS错误日志
+			Ap_Log::log('fastDFS:' . $this->_fdfs->get_last_error_no() . ':' . $this->_fdfs->get_last_error_info());
+		}
+
 		return $result;
 	}
 

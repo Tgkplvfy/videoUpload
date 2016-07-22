@@ -8,7 +8,7 @@ application.library   = ROOT_PATH "/phplib/"
 ; secret:    使用明文密码验证{token=appkey:secret}
 ; signature: 使用参数hash签名验证{token=appkey:signature}
 ; oauth:     使用OAuth2.0方式验证{access_token=xxxxxx}
-application.apiauth = secret
+application.apiauth = "secret"
 
 [dev]
 application.directory = ROOT_PATH "/app/"
