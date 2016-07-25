@@ -32,9 +32,9 @@ class Bootstrap extends Yaf_Bootstrap_Abstract{
 
         # 获取视频HXK,M3U8机密key信息
         $route = new Yaf_Route_Regex(
-            '/video\/([\w]{24})\/(low|medium|high)\/hxk/', 
+            '/video\/([\w]{24})\/(low|medium|high)\.hxk/', 
             array('controller' => 'video', 'action' => 'hxk'), 
-            array(1 => 'bkt_video_id'));
+            array(1 => 'bkt_video_id', 2 => 'definition'));
         $router->addRoute('videohxk', $route);
     }
 

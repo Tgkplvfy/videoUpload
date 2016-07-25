@@ -40,8 +40,20 @@ class M3u8Action extends Ap_Base_Action
         if ($video['status'] != Ap_Vars::FILESTATUS_FINISHED) $this->response(NULL, 404, 'file status:' . $video['status']);
 
         $fragments = $video['fragments'];
-        foreach ($fragments as $fragment)
 
-        $this->response($fragments);
+        $m3u8_info = '#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-TARGETDURATION:5
+#EXT-X-MEDIA-SEQUENCE:0
+#EXT-X-KEY:METHOD=AES-128,URI="http://videoapi.mukewang.com/video/'.$bkt_video_id.'/'.$definition.'.hxk"';
+        foreach ($fragments as $fragment) {
+            $m3u8_info .= "\n#EXTINF:{$fragment['duration']},\n{$fragment['filename']}";
+        }
+
+        $encryptor = new Ap_EncryptCommon();
+        $m3u8 = $encryptor->m3u8Encrypt($m3u8_info);
+        // exit($m3u8_info);
+        $this->response($m3u8);
+        // $this->response($m3u8);
     }
 }

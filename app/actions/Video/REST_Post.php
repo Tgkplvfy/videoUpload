@@ -1,6 +1,9 @@
 <?php 
 
-class VideoPostAction extends Ap_Base_Action 
+/**
+ * 视频上传
+ */
+class VideoPutAction extends Ap_Base_Action 
 {
     const MONGO_VIDEO_DB        = 'storage';
     const MONGO_TBL_VIDEO       = 'video';
@@ -33,21 +36,11 @@ class VideoPostAction extends Ap_Base_Action
 
         # 校验上传后的转码设置，最多设置6个转码参数
         $transcode = array();
-        if (is_array($post['parameter'])) {
-            $parameter = array_slice($post['parameter'], 0, 6, TRUE);
-            foreach ($parameter as $key => $val) {
-                isset(Ap_Vars::$transSettings[$key]) && $transcode[] = Ap_Vars::$transSettings[$key];
-            }
-        } elseif (is_string($post['parameter'])) {
-            $parameter_arr = explode(',', $post['parameter']);
-            if ( ! empty($parameter_arr)) $parameter_arr = array_unique($parameter_arr);
-            foreach ($parameter_arr as $key) {
-                isset(Ap_Vars::$transSettings[$key]) && $transcode[] = Ap_Vars::$transSettings[$key];
-            }
-        } else {
-            $this->response(NULL, 400, 'params incomplete!');
+        if ( ! isset($post['parameter']) OR ! is_array($post['parameter'])) $this->response(NULL, 400, 'params incomplete!');
+        $parameter = array_slice($post['parameter'], 0, 6, TRUE);
+        foreach ($parameter as $key => $val) {
+            isset(Ap_Vars::$transSettings[$key]) && $transcode[] = Ap_Vars::$transSettings[$key];
         }
-        if ( ! isset($post['parameter']) OR ! is_array($post['parameter'])) 
 
         // 02. 上传文件、保存文件到 FastDFS
         // $allowTypes = array('avi', 'mp4', 'flv', 'jpg', 'jpeg');    # 测试允许jpg类型
@@ -56,7 +49,7 @@ class VideoPostAction extends Ap_Base_Action
         $Uploader   = new Ap_Util_Upload($file['files'], NULL, $allowTypes, $allowSize);
         if ( ! $Uploader->upload()) # 上传失败！
         {
-            // Ap_Log::log($Uploader->last_error);          # 需要在response前执行
+            Ap_Log::log($Uploader->last_error);          # 需要在response前执行
             $this->response(NULL, 500, 'upload failed'); # 失败错误信息
         }
 
@@ -73,7 +66,7 @@ class VideoPostAction extends Ap_Base_Action
         $fileList = array ();
         foreach ($files as $file) {
             $fileList[] = array(
-                '_id' => (string) $file['_id'], 
+                '_id' => (string) $file['bkt_id'], # 返回bucket_video的id作为标示
                 'pic' => $file['pic']
             );
         }
@@ -89,8 +82,8 @@ class VideoPostAction extends Ap_Base_Action
         
         foreach ($savedFiles as $file) 
         {
-            $mongoFile = isset($file['saved']) ? $file['mongo'] : $this->__saveMainFile($file);
-            $this->__saveBucketVideo($bucketid, $title, '', $mongoFile['_id'], $watermark); # 保存上传记录
+            $mongoFile = isset($file['saved']) ? $file['mongo']: $this->__saveMainFile($file);
+            $mongoFile['bkt_id'] = $this->__saveBucketVideo($bucketid, $title, '', $mongoFile['_id'], $watermark); # 保存上传记录
 
             if (isset($file['pic']) && file_exists($file['pic'])) unlink($file['pic']); # 删除临时缩略图文件
             if ( ! isset($mongoFile['filename'])) continue; # 文件保存MongoDB失败
@@ -155,7 +148,6 @@ class VideoPostAction extends Ap_Base_Action
             'mime_type' => $file['mime_type'], 
             'md5_file'  => $file['md5'], 
             'pic'       => $videoThumb, 
-            // 'watermark' => $watermark, 
             'status'    => $file['status'], 
             'duration'  => $file['duration'] 
         );
@@ -174,25 +166,20 @@ class VideoPostAction extends Ap_Base_Action
     private function __saveBucketVideo ($bucketid, $title, $src_video_id, $dst_video_id, $watermark = '') 
     {
         $apMongo = new Ap_DB_MongoDB();
-        // $where = array(
-        //     'bucket_id'    => $bucketid, 
-        //     'title'        => $title, 
-        //     'upload_id'    => $this->upload_id, 
-        //     'dst_video_id' => $dst_video_id
-        // );
 
+        $bktId     = new MongoId();
         $tblBVideo = $apMongo->getCollection(Ap_Vars::MONGO_TBL_BUCKETVIDEO);
-        // if ( ! $tblBVideo->findOne($where)) {
-            return $tblBVideo->save(array(
-                '_id'          => new MongoId(), 
-                'bucket_id'    => $bucketid, 
-                'upload_id'    => $this->upload_id, 
-                'title'        => $title, 
-                'watermark'    => isset($watermark['_id']) ? $watermark['_id'] : '', 
-                'src_video_id' => $src_video_id, 
-                'dst_video_id' => $dst_video_id 
-            ));
-        // }
+        $tblBVideo->save(array(
+            '_id'          => $bktId, 
+            'bucket_id'    => $bucketid, 
+            'upload_id'    => $this->upload_id, 
+            'title'        => $title, 
+            'watermark'    => isset($watermark['_id']) ? $watermark['_id'] : '', 
+            'src_video_id' => $src_video_id, 
+            'dst_video_id' => $dst_video_id 
+        ));
+
+        return $bktId;
     }
 
     # 加入转码队列
@@ -210,4 +197,5 @@ class VideoPostAction extends Ap_Base_Action
 
         return TRUE;
     }
+
 }
