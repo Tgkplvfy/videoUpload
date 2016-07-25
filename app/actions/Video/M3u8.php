@@ -46,10 +46,10 @@ class M3u8Action extends Ap_Base_Action
 #EXT-X-VERSION:3
 #EXT-X-TARGETDURATION:5
 #EXT-X-MEDIA-SEQUENCE:0
-#EXT-X-KEY:METHOD=AES-128,URI="http://videoapi.mukewang.com/video/{$bkt_video_id}/{$definition}.hxk";
+#EXT-X-KEY:METHOD=AES-128,URI="http://videoapi.mukewang.com/video/{$bkt_video_id}/{$definition}.hxk?token=imooc:upload"
 m3u8;
         foreach ($fragments as $fragment) {
-            $m3u8_info .= "\n#EXTINF:{$fragment['duration']},\n{$fragment['filename']}";
+            $m3u8_info .= "\n#EXTINF:{$fragment['duration']},\nhttp://video.mukewang.com/{$fragment['filename']}";
         }
 
         $m3u8_info .= "\n#EXT-X-ENDLIST";
