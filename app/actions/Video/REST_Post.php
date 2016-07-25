@@ -3,7 +3,7 @@
 /**
  * 视频上传
  */
-class VideoPutAction extends Ap_Base_Action 
+class VideoPostAction extends Ap_Base_Action 
 {
     const MONGO_VIDEO_DB        = 'storage';
     const MONGO_TBL_VIDEO       = 'video';
