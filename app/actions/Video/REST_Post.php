@@ -36,10 +36,19 @@ class VideoPostAction extends Ap_Base_Action
 
         # 校验上传后的转码设置，最多设置6个转码参数
         $transcode = array();
-        if ( ! isset($post['parameter']) OR ! is_array($post['parameter'])) $this->response(NULL, 400, 'params incomplete!');
-        $parameter = array_slice($post['parameter'], 0, 6, TRUE);
-        foreach ($parameter as $key => $val) {
-            isset(Ap_Vars::$transSettings[$key]) && $transcode[] = Ap_Vars::$transSettings[$key];
+        if (is_array($post['parameter'])) {
+            $parameter = array_slice($post['parameter'], 0, 6, TRUE);
+            foreach ($parameter as $key => $val) {
+                isset(Ap_Vars::$transSettings[$key]) && $transcode[] = Ap_Vars::$transSettings[$key];
+            }
+        } elseif (is_string($post['parameter'])) {
+            $parameter_arr = explode(',', $post['parameter']);
+            if ( ! empty($parameter_arr)) $parameter_arr = array_unique($parameter_arr);
+            foreach ($parameter_arr as $key) {
+                isset(Ap_Vars::$transSettings[$key]) && $transcode[] = Ap_Vars::$transSettings[$key];
+            }
+        } else {
+            $this->response(NULL, 400, 'params incomplete!');
         }
 
         // 02. 上传文件、保存文件到 FastDFS
