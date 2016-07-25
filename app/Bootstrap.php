@@ -25,7 +25,7 @@ class Bootstrap extends Yaf_Bootstrap_Abstract{
 
         # 获取视频M3U8信息
         $route = new Yaf_Route_Regex(
-            '/video\/([\w]{24})\/(low|medium|high)/', 
+            '/video\/([\w]{24})\/(low|medium|high).m3u8/', 
             array('controller' => 'video', 'action' => 'm3u8'), 
             array(1 => 'bkt_video_id', 2 => 'definition'));
         $router->addRoute('videom3u8', $route);
