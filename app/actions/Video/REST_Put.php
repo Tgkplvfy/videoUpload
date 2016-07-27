@@ -75,8 +75,14 @@ class VideoPutAction extends Ap_Base_Action
         $fileList = array ();
         foreach ($files as $file) {
             $fileList[] = array(
-                '_id' => (string) $file['bkt_id'], # 返回bucket_video的id作为标示
-                'pic' => $file['pic']
+                '_id'       => (string) $file['bkt_id'], # 返回bucket_video的id作为标示
+                'duration'  => $file['duration'],
+                'filename'  => $file['filename'],
+                'md5_file'  => $file['md5_file'],
+                'mime_type' => $file['mime_type'],
+                'size'      => $file['size'],
+                'status'    => $file['status'],
+                'pic'       => $file['pic']
             );
         }
         $this->response($fileList);
