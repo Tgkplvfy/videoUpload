@@ -20,22 +20,29 @@ class Bootstrap extends Yaf_Bootstrap_Abstract{
         $router = $dispatcher->getRouter();
 
         # 获取上传视频文件基本信息
-        $route = new Yaf_Route_Regex('/video\/([\w]{24})/', array('controller' => 'video', 'action' => 'info'), array(1 => 'bkt_video_id'));
-        $router->addRoute('videoinfo', $route);
+        $route = new Yaf_Route_Regex('/video\/([\w]{24})$/', array('controller' => 'video', 'action' => 'info'), array(1 => 'bkt_video_id'));
+        $router->addRoute('video_info', $route);
 
         # 获取视频M3U8信息
         $route = new Yaf_Route_Regex(
             '/video\/([\w]{24})\/(low|medium|high).m3u8/', 
             array('controller' => 'video', 'action' => 'm3u8'), 
             array(1 => 'bkt_video_id', 2 => 'definition'));
-        $router->addRoute('videom3u8', $route);
+        $router->addRoute('video_m3u8', $route);
 
         # 获取视频HXK,M3U8机密key信息
         $route = new Yaf_Route_Regex(
-            '/video\/([\w]{24})\/(low|medium|high)\.hxk/', 
+            '/video\/([\w]{24})\/(low|medium|high).hxk/', 
             array('controller' => 'video', 'action' => 'hxk'), 
             array(1 => 'bkt_video_id', 2 => 'definition'));
-        $router->addRoute('videohxk', $route);
+        $router->addRoute('video_hxk', $route);
+
+        # 获取视频转码状态
+        $route = new Yaf_Route_Regex(
+            '/video\/([\w]{24}(,[\w]{24})*)\/status/', 
+            array('controller' => 'video', 'action' => 'status'), 
+            array(1 => 'bkt_video_ids'));
+        $router->addRoute('video_status', $route);
     }
 
     // 这个貌似没有用~~

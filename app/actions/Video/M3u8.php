@@ -1,7 +1,7 @@
 <?php 
 
 /**
- * 获取视频列表
+ * 获取视频M3U8信息
  */
 
 class M3u8Action extends Ap_Base_Action 
