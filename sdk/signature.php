@@ -26,7 +26,7 @@ class Signature
         $signature = self::getSignature($params);
         
         # 根据签名获取token
-        $token = self::$appkey . ':' . self::$signature;
+        $token = self::$appkey . ':' . $signature;
 
         return $token;
     }
