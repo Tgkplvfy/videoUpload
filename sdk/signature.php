@@ -26,7 +26,7 @@ class Signature
         $signature = self::getSignature($params);
         
         # 根据签名获取token
-        $token = self::$appkey . ':' . self::$secret;
+        $token = self::$appkey . ':' . self::$signature;
 
         return $token;
     }
@@ -46,7 +46,7 @@ class Signature
         # 过滤掉请求参数中的数组
         $params = array_filter($params, function($val){
             if (is_string($val)) return strlen($val);
-            return true;
+            return false;
         });
 
         # 排序
