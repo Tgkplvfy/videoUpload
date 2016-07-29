@@ -37,7 +37,7 @@ class Authorize_Signature
         unset($params['_']);
         $params = array_filter($params, function($val){
             if (is_string($val)) return strlen($val);
-            return true;
+            return false;
         });
 
         ksort($params);

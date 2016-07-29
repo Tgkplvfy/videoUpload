@@ -12,6 +12,7 @@ class TestGetAction extends Ap_Base_Action
         4 => 'testPhp', 
         5 => 'testFastDFS', 
         6 => 'testMongoImage', 
+        7 => 'testHeader', 
     );
 
     public function execute () 
@@ -106,6 +107,11 @@ class TestGetAction extends Ap_Base_Action
         $picHashKey = $imgAdapter->write($testfile);
         // $videoThumb = $imgAdapter->getURL($picHashKey);
         print_r($picHashKey);
+    }
+
+    public function testHeader () 
+    {
+        print_r($_SERVER);
     }
 
 }
