@@ -10,13 +10,14 @@ date_default_timezone_set('Asia/Shanghai');
 $app = new Yaf_Application(APP_PATH . '/conf/app.ini');
 $app->execute('main');
 
+# $conn = new Ap_DB_Conn();
+# $db = $conn->linkDB('course');
+
 # 转移视频文件主程序---
 function main () 
 {
     echo "Start Transfering...\n";
     $course_id = 1;
-
-    $db = Ap_DB_Conn::linkDB('course');
 
     while (TRUE) {
         $videos = getCourseVideos($course_id);
@@ -24,21 +25,21 @@ function main ()
         if ($videos === FALSE) break; # 课程循环完毕，退出
         if (empty($videos)) continue; # 课程没有视频，继续
 
-        /**
+		# 循环处理视频数据，上传fastDFS, 并保存MongoDB
         foreach ($videos as $video) {
             $video['sub_videos'] = getSubVideos($video);
             saveVideo($video);
         }
-        **/
     }
 }
 
 # 根据课程ID获取课程下的所有视频
 function getCourseVideos($course_id)
 {
-    $mysql_db = Vars::getMySQL();
-    if ($course_id > 50) return FALSE;
-    $medias = $mysql_db->fetchAll('SELECT * 
+	$conn = new Ap_DB_Conn();
+	$db = $conn->linkDB('course');
+    if ($course_id > 10) return FALSE;
+    $medias = $db->fetchAll('SELECT * 
         FROM tbl_course_media 
         WHERE type = 1 and type_id > 0 
         and status = 1 and course_id = ' . $course_id);
@@ -48,7 +49,7 @@ function getCourseVideos($course_id)
     {
         // if ( ! isset($media['type_id'])) continue;
         $video_id = $media['type_id'];
-        $video_info = $mysql_db->fetchArray('SELECT * 
+        $video_info = $db->fetchArray('SELECT * 
             FROM tbl_course_video 
             WHERE id = ' . $video_id);
 
@@ -58,13 +59,13 @@ function getCourseVideos($course_id)
             continue;
         } else {
             # 获取视频下的转码视频文件
-            $video_info['subfiles'] = $mysql_db->fetchAll('SELECT * 
+            $video_info['subfiles'] = $db->fetchAll('SELECT * 
                 FROM tbl_course_video_process 
                 WHERE video_id = ' . $video_id);
             // 
         }
 
-        print_r($video_info);
+        # print_r($video_info);
         $videos[] = $video_info;
     }
     return $videos;

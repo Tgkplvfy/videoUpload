@@ -1,0 +1,131 @@
+[product] 
+;host = 10.96.141.77,10.96.141.88
+;port = 4040 
+host = 10.96.141.76
+port = 4040 
+
+
+
+[galera]
+host = 10.96.141.77,10.96.141.88
+port = 5040 
+
+[proxy72]
+host = 10.96.141.72
+port = 4040 
+
+[course : product]  
+user = proxy_course 
+pass = course_mkw@303 
+db = course 
+
+[message : product] 
+user = proxy_message 
+pass = message_mkw@303 
+db = message 
+
+[ucloud : product] 
+user = proxy_ucloud 
+pass = ucloud_mkw@303 
+db = ucloud 
+
+[nas : product] 
+db = nas 
+
+[uext : product] 
+user = proxy_uext 
+pass = uext_mkw@303 
+db = uext 
+
+[uext1 : product] 
+user = proxy_uext 
+pass = uext_mkw@303 
+db = uext 
+
+[test : product] 
+db = test 
+
+[cms : product] 
+user = proxy_course 
+pass = course_mkw@303 
+db = course 
+
+[wireless : product] 
+user = proxy_wireless 
+pass = wireless_mkw@303 
+db = wireless 
+
+[user : product] 
+user = proxy_ucloud 
+pass = ucloud_mkw@303 
+db = ucloud 
+
+[space : product] 
+user = proxy_course 
+pass = course_mkw@303 
+db = course 
+
+[about : product] 
+user = proxy_course 
+pass = course_mkw@303 
+db = course 
+
+[wiki : product]
+user = proxy_wiki 
+pass = wiki_mkw@303 
+db = wiki 
+
+[activity: product] 
+db = activity 
+user = proxy_activi 
+pass = activity_mkw@303 
+
+[stats] 
+host = 10.96.141.72 
+port = 3306 
+user = shilj 
+pass = shilj 
+db = stats 
+
+[course_seek : product] 
+host = 10.96.141.72 
+port = 3306 
+user = shilj 
+pass = shilj 
+db = course_seek 
+
+[recommend : product] 
+user = proxy_recommend 
+pass = recommend_mkw@303 
+db = recommend 
+
+[social : product] 
+user = proxy_social
+pass = social_mkw@303 
+db = social 
+
+[ulearn : product] 
+host = 127.0.0.1
+user = proxy_ulearn
+pass = ulearn_mkw@303 
+db = ulearn
+
+[uhistory : product] 
+user = proxy_uhistory
+pass = uhistory_mkw@303
+db = uhistory
+
+[uexperience : product]
+user = proxy_uexper
+pass = uexperience_mkw@303
+db = uexperience
+
+[notice : course]
+user = proxy_notice 
+pass = notice_mkw@303
+db = notice
+
+[uprogram : product] 
+user = proxy_course
+pass = course_mkw@303
+db = course
