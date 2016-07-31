@@ -10,10 +10,8 @@ date_default_timezone_set('Asia/Shanghai');
 $app = new Yaf_Application(APP_PATH . '/conf/app.ini');
 $app->execute('main');
 
-# $conn = new Ap_DB_Conn();
-# $db = $conn->linkDB('course');
 
-# 转移视频文件主程序---
+# 转移视频文件主程序
 function main () 
 {
     echo "Start Transfering...\n";
@@ -47,7 +45,6 @@ function getCourseVideos($course_id)
     $videos = array();
     foreach ($medias as $media) 
     {
-        // if ( ! isset($media['type_id'])) continue;
         $video_id = $media['type_id'];
         $video_info = $db->fetchArray('SELECT * 
             FROM tbl_course_video 
@@ -59,25 +56,68 @@ function getCourseVideos($course_id)
             continue;
         } else {
             # 获取视频下的转码视频文件
-            $video_info['subfiles'] = $db->fetchAll('SELECT * 
+            $video = saveOriginalVideo($video);
+
+            if ( ! $video) {
+                logg("video save failed: {$video_id} of course {$media['course_id']} chapter {$media['chapter_id']}");
+                continue;
+            }
+
+            $subfiles = $db->fetchAll('SELECT * 
                 FROM tbl_course_video_process 
                 WHERE video_id = ' . $video_id);
-            // 
+
+            if (empty($subfiles)) {
+                logg("video subfiles empty: {$video_id} of course {$media['course_id']} chapter {$media['chapter_id']}");
+                continue;
+            }
+
+            $subs = array();
+            foreach ($subfiles as $file) 
+            {
+                if ($file['mime_type'] != 'mp4' OR $file['mime_type'] != 'megts') continue;
+
+                if ($file['mime_type'] == 'mp4') $subs[] = saveMp4Video();
+                if ($file['mime_type'] == 'megts') $subs[] = saveTsVideo();
+            }
+
+            $bucket = saveBktVideo($video, $subs);
+            saveLinkInfo($video, $bucket);
         }
 
-        # print_r($video_info);
-        $videos[] = $video_info;
     }
     return $videos;
 }
 
-# getSubVideos 根据视频信息获取其转码视频文件信息
-function getSubVideos($video)
+
+# 保存视频源文件
+function saveOriginalVideo()
 {
 }
 
-# saveVideo 保存视频文件信息
-function saveVideo ($video)
+# 保存转码MP4文件
+function saveMp4Video()
+{
+}
+
+# 保存转码TS文件
+function saveTsVideo()
+{
+}
+
+# 保存文件到FastDFS
+function saveToFastDFS ($path = '', $ext = '')
+{
+    try {
+        $fDFS = new Ap_Storage_FastDFS();
+        $file = $fDFS->write($path, NULL, $ext);
+    } catch (Exception $e) {
+        logg('FastDFS failed: ' . $e->getMessage());
+    }
+}
+
+# 保存信息到MongoDB
+function saveToMongoDB () 
 {
 }
 
