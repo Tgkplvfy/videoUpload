@@ -21,6 +21,7 @@ class Signature
     {
         # 默认使用$_REQUEST作为参数
         $params = empty($params) ? $_REQUEST : $params;
+        $params['timestamp'] = time();
 
         # 获取BASE64编码的签名
         $signature = self::getSignature($params);
@@ -28,7 +29,10 @@ class Signature
         # 根据签名获取token
         $token = self::$appkey . ':' . $signature;
 
-        return $token;
+        return array(
+            'token'     => $token, 
+            'timestamp' => $params['timestamp']
+        );
     }
 
     /**
@@ -45,7 +49,7 @@ class Signature
 
         # 过滤掉请求参数中的数组
         $params = array_filter($params, function($val){
-            if (is_string($val)) return strlen($val);
+            if (is_string($val) or is_numeric($val)) return strlen($val);
             return false;
         });
 

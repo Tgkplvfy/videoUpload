@@ -44,7 +44,7 @@ class Ap_Base_Control extends Yaf_Controller_Abstract
 		}
 
 		# 检验请求是否合法
-		if ($controller == 'video' && $method == 'post') return ;
+		if ($controller == 'video' && strtolower($request->getMethod()) == 'post') return ;
 		if ($controller != 'demo') 
 		{
 			$res = $this->verifyRequest();
