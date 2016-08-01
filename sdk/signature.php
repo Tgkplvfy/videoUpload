@@ -17,10 +17,9 @@ class Signature
      * 
      * @return Base64编码的签名
      */
-    public function getToken ($params = array()) 
+    public static function getToken ($params = array()) 
     {
         # 默认使用$_REQUEST作为参数
-        $params = empty($params) ? $_REQUEST : $params;
         $params['timestamp'] = time();
 
         # 获取BASE64编码的签名
