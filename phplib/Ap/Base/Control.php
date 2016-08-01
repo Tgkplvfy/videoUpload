@@ -49,7 +49,7 @@ class Ap_Base_Control extends Yaf_Controller_Abstract
 		{
 			$res = $this->verifyRequest();
 			if ($res !== TRUE) 
-				$this->response(NULL, 401, 'invalid token!');
+				$this->response($res, 401, 'invalid token!');
 			else 
 				Yaf_Registry::set('request_token', $this->getTokenInfo()); # 全局注册request_token信息
 		}
