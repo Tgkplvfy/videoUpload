@@ -14,8 +14,9 @@ class Authorize_Signature
 		if ( ! $secret) 
 			return FALSE;
 
-		if ($signature !== self::getSignature($secret, $_REQUEST)) 
-			return FALSE;
+        $my_sig = self::getSignature($secret, $_REQUEST);
+		if ($signature !== $my_sig) 
+			return array( 'signature' => $my_sig );
 
 		return TRUE;
     }
