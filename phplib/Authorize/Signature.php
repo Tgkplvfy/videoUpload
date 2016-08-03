@@ -2,6 +2,30 @@
 
 class Authorize_Signature 
 {
+    # 调试模式
+    public static $is_debug = FALSE;
+
+    # appkey
+    public static $my_appkey = FALSE;
+
+    # secret
+    public static $my_secret = FALSE;
+
+    # 请求参数
+    public static $my_params = NULL;
+
+    # 过滤后的参数
+    public static $my_filered = NULL;
+
+    # hash 值
+    public static $my_hashed = '';
+
+    # base64编码值
+    public static $my_encoded = '';
+
+    # 最终token
+    public static $my_token = '';
+
     // 校验请求是否合法
     public static function verifyRequest () 
     {
