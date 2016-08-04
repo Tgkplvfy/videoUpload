@@ -11,8 +11,11 @@ class Ap_EncryptCommon {
     protected $encrypt = array("q","h","m","k");
     protected $randkey = array();
 
+    const APP_ENCRYPT_BASE = 'mkw!@#-+';
+    const APP_ENCRYPT_AES  = 'mukewang';
+
+    # m3u8Encrypt 加密算法
     public function m3u8Encrypt($str) {
-        Yaf_Dispatcher::getInstance ()->disableView ();
         $this->str=$str;
         $this->strlen=strlen($this->str);
         #记录算法顺序
@@ -21,10 +24,10 @@ class Ap_EncryptCommon {
         $table[] = $this->encrypt[array_rand($this->encrypt,1)];
         $table[] = $this->encrypt[array_rand($this->encrypt,1)];
         $table[] = $this->encrypt[array_rand($this->encrypt,1)];
-//        $table[] = "m";
-//        $table[] = "q";
-//        $table[] = "h";
-//        $table[] = "k";
+        // $table[] = "m";
+        // $table[] = "q";
+        // $table[] = "h";
+        // $table[] = "k";
         foreach($table as $v){
             switch ($v) {
                 case 'q':
@@ -101,6 +104,30 @@ class Ap_EncryptCommon {
         return $return_result;
 
     }
+
+
+    # 针对App的M3U8内容加密算法
+    public function m3u8AppEncrypt ($str) 
+    {
+        if (empty($str)) return FALSE;
+
+        $newkey = 0x10;
+
+        $base_len = strlen(self::APP_ENCRYPT_BASE);
+
+        $len = strlen($str);
+        for ($i = 0; $i < $len; $i++) {
+            $newkey .= $str[i] ^ self::APP_ENCRYPT_BASE[$i % $base_len];
+        }
+
+        for ($i = 0; $i < $len; $i++) {
+            $newkey .= $newkey[$i + 1] ^ self::APP_ENCRYPT_AES[$i % $base_len];
+        }
+
+        return $newkey;
+    }
+
+    # yhlx
     public function yhlx($str,$strlen,$key,$keylen){
         for ($i = 0 ; $i < $strlen; $i++) {
             $str[$i] = $str[$i] ^ $key[$i%$keylen];
@@ -123,6 +150,8 @@ class Ap_EncryptCommon {
 
         return $str;
     }
+
+    # cr
     public function cr($str,$strlen){
         $output=array();
         for($i=0;$i<$strlen;$i++){
@@ -139,6 +168,8 @@ class Ap_EncryptCommon {
         $this->strlen=count($output);
         return implode("", $output);
     }
+
+    # lx
     public function lx($str,$strlen){
         for($i=0;$i<$strlen;$i++){
 
@@ -157,6 +188,7 @@ class Ap_EncryptCommon {
         return $str;
     }
 
+    # yh
     public function yh($str,$strlen,$key,$keylen){
         $crytxt = '';
         for($i=0;$i<$strlen;$i++)
@@ -165,6 +197,8 @@ class Ap_EncryptCommon {
         }
         return $crytxt;
     }
+
+    # getkey
     public function getkey($length = 8) {
         // 密码字符集，可任意添加你需要的字符
         $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -175,6 +209,7 @@ class Ap_EncryptCommon {
         return $password;
     }
 
+    # str_insert
     function str_insert($str, $i, $substr) {
         $startstr="";
         $laststr="";
@@ -188,6 +223,7 @@ class Ap_EncryptCommon {
         return $str;
     }
 
+    # xor_enc
     public function xor_enc($str,$key)
     {
         $crytxt = '';

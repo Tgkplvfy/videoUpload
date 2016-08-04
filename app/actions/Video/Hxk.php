@@ -40,9 +40,16 @@ class HxkAction extends Ap_Base_Action
         if ($video['status'] != Ap_Vars::FILESTATUS_FINISHED) $this->response(NULL, 404, 'file status:' . $video['status']);
 
         $secretkey = $video['secret_key'];
-        $key_info = pack("H32", $secretkey);
+        $key_info  = pack("H32", $secretkey);
         $encryptor = new Ap_EncryptCommon();
-        $hxk = $encryptor->m3u8Encrypt($key_info);
+        
+        if (isset($_REQUEST['plat']) && $_REQUEST['plat'] == 'app') {
+            // $m3u8 = $encryptor->m3u8AppEncrypt($m3u8_info);
+            $hxk = $encryptor->m3u8AppEncrypt($key_info);
+        } else {
+            $hxk = $encryptor->m3u8Encrypt($key_info);
+            // $m3u8 = $encryptor->m3u8Encrypt($m3u8_info);
+        }
         $this->response($hxk);
     }
 }

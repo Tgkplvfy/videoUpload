@@ -15,17 +15,20 @@ class Authorize_Base
     // 获取请求Token信息
     public static function getRequestToken () 
     {
-        if (isset($_SERVER['HTTP_TOKEN']) && strpos($_SERVER['HTTP_TOKEN'], ':') !== FALSE) 
-            $this->request_token = $_SERVER['HTTP_TOKEN'];
+        // if (isset($_SERVER['HTTP_TOKEN']) && strpos($_SERVER['HTTP_TOKEN'], ':') !== FALSE) 
+        //     $this->request_token = $_SERVER['HTTP_TOKEN'];
 
-        if (isset($_SERVER['HTTP_TIMESTAMP'])) 
-            $this->request_timestamp = $_SERVER['HTTP_TIMESTAMP'];
+        // if (isset($_SERVER['HTTP_TIMESTAMP'])) 
+        //     $this->request_timestamp = $_SERVER['HTTP_TIMESTAMP'];
         
         if (isset($_REQUEST['token']) && strpos($_REQUEST['token'], ':') !== FALSE) 
             $this->request_token = $_REQUEST['token'];
             
         if (isset($_REQUEST['timestamp'])) 
             $this->request_timestamp = $_REQUEST['timestamp'];
+        
+        Yaf_Registry::set('request_token', $this->request_token);
+        Yaf_Registry::set('request_timestamp', $this->request_timestamp);
     }
 
     // 获取请求app信息

@@ -41,12 +41,17 @@ class M3u8Action extends Ap_Base_Action
 
         $fragments = $video['fragments'];
 
+        $appkey  = Yaf_Registry::set('request_appkey');
+        $secret  = Yaf_Registry::set('request_secret');
+        $token   = Ap_Token::getToken(array(), $appkey, $secret);
+        $hxk_url = "http://videoapi.mukewang.com/video/{$bkt_video_id}/{$definition}.hxk?" . http_build_query($token);
+
         $m3u8_info = <<<m3u8
 #EXTM3U
 #EXT-X-VERSION:3
 #EXT-X-TARGETDURATION:5
 #EXT-X-MEDIA-SEQUENCE:0
-#EXT-X-KEY:METHOD=AES-128,URI="http://videoapi.mukewang.com/video/{$bkt_video_id}/{$definition}.hxk?token=imooc:upload"
+#EXT-X-KEY:METHOD=AES-128,URI="{$hxk_url}"
 m3u8;
         foreach ($fragments as $fragment) {
             $m3u8_info .= "\n#EXTINF:{$fragment['duration']},\nhttp://video.mukewang.com/{$fragment['filename']}";
@@ -55,9 +60,13 @@ m3u8;
         $m3u8_info .= "\n#EXT-X-ENDLIST";
 
         $encryptor = new Ap_EncryptCommon();
-        $m3u8 = $encryptor->m3u8Encrypt($m3u8_info);
-        // exit($m3u8_info);
+
+        if (isset($_REQUEST['plat']) && $_REQUEST['plat'] == 'app') {
+            $m3u8 = $encryptor->m3u8AppEncrypt($m3u8_info);
+        } else {
+            $m3u8 = $encryptor->m3u8Encrypt($m3u8_info);
+        }
+        
         $this->response($m3u8);
-        // $this->response($m3u8);
     }
 }
