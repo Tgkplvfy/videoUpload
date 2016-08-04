@@ -46,7 +46,8 @@ class M3u8Action extends Ap_Base_Action
         $secret  = Yaf_Registry::get('request_secret');
         if (isset($_REQUEST['plat'])) $params = array('plat'=>$_REQUEST['plat']);
         $token   = Ap_Token::getToken($params, $appkey, $secret);
-        $hxk_url = "http://videoapi.mukewang.com/video/{$bkt_video_id}/{$definition}.hxk?" . http_build_query($token);
+        $params  = array_merge($params, $token);
+        $hxk_url = "http://videoapi.mukewang.com/video/{$bkt_video_id}/{$definition}.hxk?" . http_build_query($params);
 
         $m3u8_info = <<<m3u8
 #EXTM3U

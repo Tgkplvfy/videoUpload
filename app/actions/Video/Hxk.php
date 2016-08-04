@@ -44,7 +44,8 @@ class HxkAction extends Ap_Base_Action
         $encryptor = new Ap_EncryptCommon();
         
         if (isset($_REQUEST['plat']) && $_REQUEST['plat'] == 'app') {
-            $hxk = $encryptor->xor_enc($key_info);
+            $hxk = $encryptor->m3u8AppEncrypt($key_info);
+            exit($hxk);
         } else {
             $hxk = $encryptor->m3u8Encrypt($key_info);
         }
