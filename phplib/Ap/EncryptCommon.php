@@ -110,7 +110,7 @@ class Ap_EncryptCommon {
     {
         if (empty($str)) return FALSE;
 
-        $newkey = 0x10;
+        $newkey   = chr(0x10);
 
         $base_len = strlen(self::APP_ENCRYPT_BASE);
         $base_str = self::APP_ENCRYPT_BASE;
@@ -123,7 +123,7 @@ class Ap_EncryptCommon {
         }
 
         for ($i = 0; $i < $len; $i++) {
-            $newkey .= $newkey[$i + 1] ^ $base_aes[$i % $base_len];
+            $newkey[$i+1] = $newkey[$i + 1] ^ $base_aes[$i % $base_len];
         }
 
         return $newkey;

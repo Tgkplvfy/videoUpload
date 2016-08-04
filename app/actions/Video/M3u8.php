@@ -65,7 +65,8 @@ m3u8;
         $encryptor = new Ap_EncryptCommon();
 
         if (isset($_REQUEST['plat']) && $_REQUEST['plat'] == 'app') {
-            $m3u8 = $encryptor->xor_enc($m3u8_info);
+            exit($m3u8_info);
+            // $m3u8 = $encryptor->xor_enc($m3u8_info);
         } else {
             $m3u8 = $encryptor->m3u8Encrypt($m3u8_info);
         }
