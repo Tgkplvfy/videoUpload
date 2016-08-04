@@ -41,8 +41,8 @@ class M3u8Action extends Ap_Base_Action
 
         $fragments = $video['fragments'];
 
-        $appkey  = Yaf_Registry::set('request_appkey');
-        $secret  = Yaf_Registry::set('request_secret');
+        $appkey  = Yaf_Registry::get('request_appkey');
+        $secret  = Yaf_Registry::get('request_secret');
         $token   = Ap_Token::getToken(array(), $appkey, $secret);
         $hxk_url = "http://videoapi.mukewang.com/video/{$bkt_video_id}/{$definition}.hxk?" . http_build_query($token);
 

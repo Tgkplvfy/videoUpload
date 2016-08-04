@@ -6,7 +6,7 @@
  * - @author qirl 2016-07-18
  */
 
-class Signature 
+class Ap_Token 
 {
     private static $appkey = 'imooc';
     private static $secret = 'upload';
