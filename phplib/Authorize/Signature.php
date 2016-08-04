@@ -51,8 +51,8 @@ class Authorize_Signature
 		$MongoDB = new Ap_DB_MongoDB ();
 		$appInfo = $MongoDB->getCollection('auth_keys')->findOne(array('appkey' => $appkey));
 
-        Yaf_Registry::set('request_appkey', $this->appInfo['appkey']);
-        Yaf_Registry::set('request_secret', $this->appInfo['secret']);
+        Yaf_Registry::set('request_appkey', $appInfo['appkey']);
+        Yaf_Registry::set('request_secret', $appInfo['secret']);
 
 		return $appInfo ? $appInfo['secret'] : FALSE;
 	}
