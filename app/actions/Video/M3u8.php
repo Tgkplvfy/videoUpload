@@ -41,9 +41,11 @@ class M3u8Action extends Ap_Base_Action
 
         $fragments = $video['fragments'];
 
+        $params  = array();
         $appkey  = Yaf_Registry::get('request_appkey');
         $secret  = Yaf_Registry::get('request_secret');
-        $token   = Ap_Token::getToken(array(), $appkey, $secret);
+        if (isset($_REQUEST['plat'])) $params = array('plat'=>$_REQUEST['plat']);
+        $token   = Ap_Token::getToken($params, $appkey, $secret);
         $hxk_url = "http://videoapi.mukewang.com/video/{$bkt_video_id}/{$definition}.hxk?" . http_build_query($token);
 
         $m3u8_info = <<<m3u8
@@ -62,7 +64,7 @@ m3u8;
         $encryptor = new Ap_EncryptCommon();
 
         if (isset($_REQUEST['plat']) && $_REQUEST['plat'] == 'app') {
-            $m3u8 = $encryptor->m3u8AppEncrypt($m3u8_info);
+            $m3u8 = $encryptor->xor_enc($m3u8_info);
         } else {
             $m3u8 = $encryptor->m3u8Encrypt($m3u8_info);
         }

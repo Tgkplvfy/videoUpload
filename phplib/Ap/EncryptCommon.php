@@ -105,7 +105,6 @@ class Ap_EncryptCommon {
 
     }
 
-
     # 针对App的M3U8内容加密算法
     public function m3u8AppEncrypt ($str) 
     {
@@ -114,14 +113,17 @@ class Ap_EncryptCommon {
         $newkey = 0x10;
 
         $base_len = strlen(self::APP_ENCRYPT_BASE);
+        $base_str = self::APP_ENCRYPT_BASE;
+        $base_aes = self::APP_ENCRYPT_AES;
+
 
         $len = strlen($str);
         for ($i = 0; $i < $len; $i++) {
-            $newkey .= $str[$i] ^ self::APP_ENCRYPT_BASE[$i % $base_len];
+            $newkey .= $str[$i] ^ $base_str[$i % $base_len];
         }
 
         for ($i = 0; $i < $len; $i++) {
-            $newkey .= $newkey[$i + 1] ^ self::APP_ENCRYPT_AES[$i % $base_len];
+            $newkey .= $newkey[$i + 1] ^ $base_aes[$i % $base_len];
         }
 
         return $newkey;
@@ -224,7 +226,7 @@ class Ap_EncryptCommon {
     }
 
     # xor_enc
-    public function xor_enc($str,$key)
+    public function xor_enc($str, $key = 'imooc_m3u8_Nfjh2gm')
     {
         $crytxt = '';
         $keylen = strlen($key);
