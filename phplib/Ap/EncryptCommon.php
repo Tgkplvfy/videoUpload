@@ -117,7 +117,7 @@ class Ap_EncryptCommon {
 
         $len = strlen($str);
         for ($i = 0; $i < $len; $i++) {
-            $newkey .= $str[i] ^ self::APP_ENCRYPT_BASE[$i % $base_len];
+            $newkey .= $str[$i] ^ self::APP_ENCRYPT_BASE[$i % $base_len];
         }
 
         for ($i = 0; $i < $len; $i++) {
